@@ -139,21 +139,30 @@ app.post('/api/plan-trip', async (req, res) => {
     };
 
     try {
-        // Send both emails appropriately
-        // We await them to ensure they are sent before responding
-        await transporter.sendMail(agencyMailOptions);
-        console.log('Agency notification sent.');
+        // Send emails in background (non-blocking with 10s timeout)
+        const sendWithTimeout = (mailOptions) => {
+            return Promise.race([
+                transporter.sendMail(mailOptions),
+                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
+            ]);
+        };
 
-        // Only try to send to customer if they provided an email
+        // Fire and forget - don't wait for emails
+        sendWithTimeout(agencyMailOptions)
+            .then(() => console.log('✅ Agency email sent'))
+            .catch(err => console.error('❌ Agency email failed:', err.message));
+
         if (formData.email && formData.email.includes('@')) {
-            await transporter.sendMail(customerMailOptions);
-            console.log('Customer confirmation sent to:', formData.email);
+            sendWithTimeout(customerMailOptions)
+                .then(() => console.log('✅ Customer email sent'))
+                .catch(err => console.error('❌ Customer email failed:', err.message));
         }
 
-        res.status(200).json({ success: true, message: 'Trip request submitted! Check your email.' });
+        // Respond immediately (don't wait for emails)
+        res.status(200).json({ success: true, message: 'Trip request received! We\'ll contact you soon.' });
     } catch (error) {
-        console.error('Email sending error:', error);
-        res.status(500).json({ success: false, message: 'Failed to send emails. Please try again.' });
+        console.error('❌ Error:', error);
+        res.status(500).json({ success: false, message: 'Failed to process request.' });
     }
 });
 
