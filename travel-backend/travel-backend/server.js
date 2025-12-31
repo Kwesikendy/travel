@@ -3,7 +3,7 @@
 // 1. Import Dependencies
 const express = require('express');
 const bodyParser = require('body-parser');
-const nodemailer = require('nodemailer');
+const { Resend } = require('resend');
 const cors = require('cors'); // Added CORS
 const bcrypt = require('bcryptjs'); // For password hashing
 const jwt = require('jsonwebtoken'); // For user authentication tokens
@@ -86,19 +86,13 @@ app.post('/api/plan-trip', async (req, res) => {
     const formData = req.body;
     console.log('Received Trip Plan Request:', formData);
 
-    // Prepare Nodemailer Transporter
-    const transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'dogbeynathan7@gmail.com', // Your Gmail
-            pass: 'tbot jkok veym tkjs'     // Your App Password
-        }
-    });
+    // Initialize Resend with API key
+    const resend = new Resend('re_SjbSEvkm_D8thYh6VonZhDPV72RJAJQWK');
 
     // 1. Email to AGENCY (The Lead)
-    const agencyMailOptions = {
-        from: '"Greater & Better Travel" <dogbeynathan7@gmail.com>',
-        to: 'dogbeynathan7@gmail.com', // Admin Email
+    const agencyEmail = {
+        from: 'Greater & Better Travel <onboarding@resend.dev>',
+        to: 'dogbeynathan7@gmail.com',
         subject: `✈️ NEW TRIP LEAD: ${formData.destination || 'Unspecified'} (${formData.fullName})`,
         html: `
             <h2>New Trip Request!</h2>
@@ -115,9 +109,9 @@ app.post('/api/plan-trip', async (req, res) => {
     };
 
     // 2. Email to CUSTOMER (The Confirmation)
-    const customerMailOptions = {
-        from: '"Greater & Better Travel" <dogbeynathan7@gmail.com>',
-        to: formData.email, // The customer's email
+    const customerEmail = {
+        from: 'Greater & Better Travel <onboarding@resend.dev>',
+        to: formData.email,
         subject: `Trip Request Received: ${formData.destination}`,
         html: `
             <div style="font-family: Arial, sans-serif; color: #333;">
@@ -139,27 +133,20 @@ app.post('/api/plan-trip', async (req, res) => {
     };
 
     try {
-        // Send emails in background (non-blocking with 10s timeout)
-        const sendWithTimeout = (mailOptions) => {
-            return Promise.race([
-                transporter.sendMail(mailOptions),
-                new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 10000))
-            ]);
-        };
-
-        // Fire and forget - don't wait for emails
-        sendWithTimeout(agencyMailOptions)
-            .then(() => console.log('✅ Agency email sent'))
+        // Send agency email via Resend (non-blocking)
+        resend.emails.send(agencyEmail)
+            .then(() => console.log('✅ Agency email sent via Resend'))
             .catch(err => console.error('❌ Agency email failed:', err.message));
 
+        // Send customer email via Resend (non-blocking)
         if (formData.email && formData.email.includes('@')) {
-            sendWithTimeout(customerMailOptions)
-                .then(() => console.log('✅ Customer email sent'))
+            resend.emails.send(customerEmail)
+                .then(() => console.log('✅ Customer email sent via Resend'))
                 .catch(err => console.error('❌ Customer email failed:', err.message));
         }
 
-        // Respond immediately (don't wait for emails)
-        res.status(200).json({ success: true, message: 'Trip request received! We\'ll contact you soon.' });
+        // Respond immediately
+        res.status(200).json({ success: true, message: 'Trip request received! Check your email.' });
     } catch (error) {
         console.error('❌ Error:', error);
         res.status(500).json({ success: false, message: 'Failed to process request.' });
