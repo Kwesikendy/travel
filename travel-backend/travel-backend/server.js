@@ -14,6 +14,9 @@ const PORT = 3000;
 // Enable CORS for all routes (allows frontend at a different port/file to communicate)
 app.use(cors());
 
+// Serve static files from 'public' folder (Frontend)
+app.use(express.static('public'));
+
 // --- Security and Configuration ---
 const SECRET_KEY = 'YOUR_SUPER_SECRET_KEY'; // **CRITICAL: REPLACE THIS WITH A LONG, COMPLEX, RANDOM STRING**
 
