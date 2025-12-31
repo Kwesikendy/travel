@@ -1,0 +1,1237 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GREATER & BETTER TRAVEL AGENCY</title>
+
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        html {
+            scroll-behavior: smooth;
+            /* Smooth scrolling for anchor links */
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        /* ------------------ BODY / FIXED BACKGROUND ------------------ */
+        body {
+            font-family: 'Inter', sans-serif;
+            color: #333333;
+            line-height: 1.6;
+            overflow-x: hidden;
+
+            /* NIGHT background (Assuming you renamed your file) */
+            background: url('background-night.jpg') no-repeat center center fixed;
+            background-size: cover;
+
+            min-height: 100vh;
+        }
+
+        /* Layer for the Day Background (initially transparent) */
+        #day-background {
+            position: fixed;
+            inset: 0;
+            background: url('background-day.jpg') no-repeat center center fixed;
+            background-size: cover;
+            z-index: -2;
+            opacity: 0;
+            transition: opacity 2s ease-in-out;
+            /* Smooth fade transition */
+        }
+
+        /* Create a full-screen, subtle dark overlay for better text contrast overall */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            /* Dark overlay */
+            z-index: -1;
+        }
+
+        /* ------------------ SPLASH SCREEN ------------------ */
+        #splash {
+            position: fixed;
+            inset: 0;
+            background: #000;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 5000;
+            transition: opacity 0.8s ease;
+        }
+
+        #splash.hide {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .splash-logo {
+            width: 150px;
+            margin-bottom: 20px;
+            border-radius: 15px;
+            animation: popin 1s ease both;
+        }
+
+        .splash-title {
+            color: rgb(255, 153, 0);
+            font-family: "Playfair Display", serif;
+            font-size: 2rem;
+            margin-bottom: 5px;
+        }
+
+        .splash-sub {
+            color: rgb(255, 255, 255);
+            font-size: 1rem;
+            letter-spacing: 3px;
+        }
+
+        @keyframes popin {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+
+        /* ------------------ MAIN CONTENT ------------------ */
+        #main-content {
+            background-color: transparent;
+            transition: transform 0.5s ease-in-out;
+        }
+
+        /* ADDED: Style for the Day/Night Toggle Button (Top Left) */
+        #time-toggle {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: fixed;
+            top: 25px;
+            left: 30px;
+            font-size: 24px;
+            /* Slightly smaller, more refined icon */
+            color: #d1a340;
+            /* Brand GOLD color */
+            z-index: 1000;
+            cursor: pointer;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            /* Perfect circle */
+
+            /* Premium Glass Effect */
+            background: rgba(25, 25, 25, 0.6);
+            /* Darker semi-transparent base for contrast */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(209, 163, 64, 0.3);
+            /* Subtle gold border */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        #time-toggle:hover {
+            background: rgba(209, 163, 64, 0.2);
+            /* Gold tint on hover */
+            border-color: #d1a340;
+            transform: rotate(15deg) scale(1.05);
+            /* Playful interaction */
+            box-shadow: 0 0 15px rgba(209, 163, 64, 0.4);
+            /* Glow effect */
+        }
+
+        /* ------------------ RESPONSIVE NAVBAR ------------------ */
+        /* Desktop: Horizontal sticky navbar */
+        #nav-links {
+            position: fixed;
+            top: 0;
+            right: 0;
+            left: 0;
+            display: flex;
+            flex-direction: row;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 30px;
+            padding: 20px 40px;
+            background: rgba(255, 255, 255, 0.05);
+            /* Light glassmorphism */
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            z-index: 999;
+        }
+
+        #nav-links a {
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 16px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            border-radius: 4px;
+        }
+
+        #nav-links a:hover {
+            background: rgba(209, 163, 64, 0.2);
+            color: #d1a340;
+        }
+
+        /* Hamburger Menu - Hidden on Desktop */
+        #menu-toggle {
+            display: none;
+            /* Hidden by default on desktop */
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            font-size: 30px;
+            color: #d1a340;
+            z-index: 1001;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 8px;
+            background: rgba(26, 26, 46, 0.8);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(209, 163, 64, 0.3);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
+        #menu-toggle:hover {
+            background: rgba(209, 163, 64, 0.2);
+            border-color: #d1a340;
+        }
+
+        /* Mobile Styles (≤768px) */
+        @media (max-width: 768px) {
+
+            /* Show hamburger on mobile */
+            #menu-toggle {
+                display: block;
+            }
+
+            /* Hide navbar by default on mobile */
+            #nav-links {
+                display: none;
+                position: fixed;
+                top: 70px;
+                right: 20px;
+                left: auto;
+                flex-direction: column;
+                align-items: flex-start;
+                background: rgba(26, 26, 46, 0.95);
+                padding: 20px;
+                border-radius: 8px;
+                min-width: 200px;
+                gap: 0;
+            }
+
+            /* Show navbar when active (hamburger clicked) */
+            #nav-links.active {
+                display: flex;
+            }
+
+            #nav-links a {
+                width: 100%;
+                padding: 12px 16px;
+                border-radius: 4px;
+            }
+        }
+
+
+        /* ------------------ HERO SECTION (New Layout) ------------------ */
+        .hero {
+            position: relative;
+            background: transparent;
+            padding: 20px;
+            color: rgb(255, 255, 255);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1.5fr;
+            /* 3 Columns: Logo | Text | Images */
+            max-width: 1400px;
+            margin: auto;
+            position: relative;
+            z-index: 2;
+            gap: 30px;
+            width: 100%;
+            align-items: start;
+        }
+
+        /* Container for the logo (Left side) */
+        .hero-nav-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            padding-top: 50px;
+            align-items: center;
+            padding-left: 20px;
+            text-align: center;
+        }
+
+        /* Hero Text (Middle side) */
+        .hero-text-content {
+            padding-top: 50px;
+            text-align: left;
+        }
+
+
+        .hero h2 {
+            font-size: 48px;
+            font-family: 'Playfair Display', serif;
+        }
+
+        .hero p {
+            margin: 20px 0;
+            font-size: 18px;
+        }
+
+        .hero button {
+            background: linear-gradient(135deg, #d1a340 0%, #f4c542 100%);
+            /* Gold gradient */
+            color: #1a1a2e;
+            /* Dark text for contrast */
+            border: none;
+            padding: 18px 40px;
+            /* Larger padding */
+            border-radius: 50px;
+            /* Pill shape */
+            font-weight: 700;
+            font-size: 1.1rem;
+            /* Larger text */
+            cursor: pointer;
+            box-shadow: 0 8px 20px rgba(209, 163, 64, 0.4);
+            /* Gold glow */
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .hero button:hover {
+            background: linear-gradient(135deg, #f4c542 0%, #d1a340 100%);
+            /* Reverse gradient */
+            transform: translateY(-3px) scale(1.05);
+            /* Lift and grow */
+            box-shadow: 0 12px 30px rgba(209, 163, 64, 0.6);
+            /* Stronger glow */
+        }
+
+        /* Hero Images (Right side) */
+        .hero-images {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            /* CHANGED: Aligning the images with the logo/text */
+            padding-top: 50px;
+        }
+
+        .hero-images img {
+            width: 100%;
+            /* FIX: Set fixed height for uniform size on all screen sizes */
+            height: 250px;
+            object-fit: cover;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+
+
+
+        /* ------------------ SECTIONS ------------------ */
+        .section {
+            max-width: 1200px;
+            margin: 60px auto;
+            padding: 0 20px;
+            background-color: transparent;
+        }
+
+        /* ------------------ GLASS EFFECT (Dark Sections: Destinations, Stories, Highlights) - DESKTOP DEFAULT ------------------ */
+        .destination-background {
+            position: relative;
+            padding: 60px 20px;
+            color: white;
+            border-radius: 12px;
+            /* Adjusted top margin to create space for the finder to overlap */
+            margin: 90px auto 60px auto;
+
+            /* Glass Effect Styling (Black) */
+            background: rgba(0, 0, 0, 0);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgb(0, 0, 0);
+            border: 1px solid rgba(255, 255, 255, 0.685);
+        }
+
+        .destination-background>* {
+            position: relative;
+            z-index: 2;
+        }
+
+        .destination-background h3 {
+            text-align: center;
+            margin-bottom: 30px;
+            font-size: 2rem;
+        }
+
+        .destinations {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden;
+            color: #333;
+        }
+
+        .card img {
+            width: 100%;
+            height: 180px;
+            object-fit: cover;
+        }
+
+        .info {
+            padding: 15px;
+        }
+
+        .destination-background .stories .story,
+        .destination-background .highlight {
+            color: white;
+        }
+
+        .stories .story {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .story img {
+            width: 140px;
+            height: 90px;
+            border-radius: 8px;
+        }
+
+        .highlight {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .highlight img {
+            width: 120px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            flex-shrink: 0;
+        }
+
+        /* ------------------ NEWSLETTER (UPDATED GLASS EFFECT) - DESKTOP DEFAULT ------------------ */
+        .newsletter {
+            color: white;
+            padding: 60px 20px;
+            border-radius: 12px;
+            text-align: center;
+            max-width: 1200px;
+            margin: 60px auto;
+
+            /* Glass Effect Styling (Dark Blue) */
+            background: rgba(42, 31, 107, 0.466);
+            /* Dark Blue semi-transparent base */
+            backdrop-filter: blur(8px);
+            /* Less blur than the black sections */
+            -webkit-backdrop-filter: blur(8px);
+            box-shadow: 0 4px 30px rgb(0, 0, 0);
+            border: 1px solid rgba(255, 255, 255, 0.479);
+        }
+
+        .newsletter input {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            width: 250px;
+            margin-right: 10px;
+        }
+
+        .newsletter button {
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            background: #d1a340;
+            color: white;
+        }
+
+        /* ------------------ TRIP FORM (New Page Simulation) ------------------ */
+        #trip-page {
+            position: fixed;
+            inset: 0;
+            background: transparent;
+            z-index: 4000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        #trip-page::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: -1;
+        }
+
+        #trip-page.active {
+            display: flex;
+        }
+
+        #trip-page h3 {
+            color: #d1a340;
+            font-size: 2rem;
+            margin-bottom: 10px;
+            text-align: center;
+            font-family: 'Playfair Display', serif;
+            text-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        #trip-page .form-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 700px;
+            width: 100%;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-height: 85vh;
+            /* Prevent overflow */
+            overflow-y: auto;
+            /* Scroll if needed */
+        }
+
+        #trip-page form {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        /* Modern label styling */
+        #trip-page form label {
+            display: flex;
+            flex-direction: column;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        #trip-page form label input {
+            margin-top: 8px;
+        }
+
+        /* Modern input styling */
+        #trip-page form input,
+        #trip-page form textarea {
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            width: 100%;
+            box-sizing: border-box;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        #trip-page form input:focus,
+        #trip-page form textarea:focus {
+            outline: none;
+            border-color: #d1a340;
+            box-shadow: 0 0 0 3px rgba(209, 163, 64, 0.1);
+        }
+
+        /* Visa Type and Textarea span full width */
+        #trip-page form input:nth-child(1),
+        #trip-page form textarea,
+        #trip-page form button {
+            grid-column: span 2;
+        }
+
+        /* Premium submit button */
+        #trip-page form button {
+            background: linear-gradient(135deg, #d1a340 0%, #f4c542 100%);
+            color: #1a1a2e;
+            border: none;
+            padding: 16px 32px;
+            border-radius: 50px;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 20px rgba(209, 163, 64, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        #trip-page form button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #f4c542 0%, #d1a340 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(209, 163, 64, 0.5);
+        }
+
+        #trip-page form button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Close button - Premium style */
+        #trip-page .close-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 5000;
+        }
+
+        #trip-page .close-btn:hover {
+            background: rgba(209, 163, 64, 0.3);
+            border-color: #d1a340;
+            transform: rotate(90deg);
+        }
+
+
+        /* ------------------ FOOTER ------------------ */
+        footer {
+            background: rgba(17, 17, 17, 0.9);
+            color: #aaa;
+            padding: 30px 20px;
+            text-align: center;
+        }
+
+        /* --- NEW: Global Image Hover Effect --- */
+        .hero-images img,
+        .card img,
+        .story img,
+        .highlight img {
+            /* Ensures the scale effect is smooth and not immediate */
+            transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
+            cursor: pointer;
+            /* Indicates interactivity */
+        }
+
+        .hero-images img:hover,
+        .card img:hover,
+        .story img:hover,
+        .highlight img:hover {
+            /* Makes the image grow slightly (1.05x original size) */
+            transform: scale(1.05);
+
+            /* Optional: Enhance shadow on hover for a lift effect */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.5);
+        }
+
+        /* ------------------ MOBILE ------------------ */
+        @media(max-width:768px) {
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                /* Single column on mobile */
+                gap: 20px;
+            }
+
+            .hero-nav-container {
+                padding-top: 0;
+                align-items: center;
+                gap: 10px;
+                padding-left: 0;
+                text-align: center;
+            }
+
+            .hero-text-content {
+                padding-top: 0;
+                text-align: center;
+            }
+
+            .hero-images {
+                display: grid;
+                padding-top: 0;
+            }
+
+            /* === START: REMOVE ALL CONTAINER BACKGROUNDS AND GLASS EFFECTS FOR MOBILE === */
+
+            /* 1. Vacation Search Bar (White/Light Glass) */
+            #vacation-finder {
+                flex-direction: column;
+                align-items: stretch;
+                padding: 15px;
+                margin: 20px auto;
+                max-width: 95%;
+
+                /* --- REMOVE ALL VISUALS --- */
+                background: transparent;
+                color: white;
+                /* Change text color back to white for background visibility */
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                box-shadow: none;
+                border: none;
+                /* --------------------------- */
+            }
+
+            /* Adjust input containers inside the now-transparent finder */
+            #vacation-finder label,
+            .date-range-box {
+                color: white;
+                background: rgba(0, 0, 0, 0.3);
+                /* Slight dark shade for contrast on input fields */
+                border: 1px solid rgba(255, 255, 255, 0.5);
+            }
+
+            /* Adjust text and placeholder inside inputs for contrast */
+            #vacation-finder input {
+                color: white;
+            }
+
+            #vacation-finder input::placeholder {
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            #vacation-finder button {
+                align-self: stretch;
+                margin-top: 10px;
+            }
+
+            #vacation-finder label:first-child {
+                margin-bottom: 15px;
+            }
+
+            /* 2. Main Sections (Dark Glass: Destinations, Stories, Highlights) */
+            .destination-background {
+                padding: 30px 15px;
+                margin: 50px auto 30px auto;
+
+                /* --- REMOVE ALL VISUALS --- */
+                background: transparent;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                box-shadow: none;
+                border: none;
+                /* --------------------------- */
+            }
+
+            /* 3. Newsletter Section (Blue Glass) */
+            .newsletter {
+                padding: 40px 15px;
+                margin: 40px auto;
+
+                /* --- REMOVE ALL VISUALS --- */
+                background: transparent;
+                backdrop-filter: none;
+                -webkit-backdrop-filter: none;
+                box-shadow: none;
+                border: none;
+                /* --------------------------- */
+            }
+
+            /* 4. Adjust headings for better fit */
+            .destination-background h3,
+            .newsletter h3 {
+                font-size: 1.5rem;
+            }
+
+            /* 5. Newsletter input/button adjustments */
+            .newsletter input {
+                width: 100%;
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+
+            .newsletter button {
+                width: 100%;
+            }
+
+            /* === END: MOBILE TRANSPARENT BACKGROUNDS === */
+
+            /* Date input adjustments */
+            .date-inputs {
+                gap: 10px;
+            }
+
+            .date-inputs input {
+                width: 50%;
+            }
+
+            #trip-page form {
+                grid-template-columns: 1fr;
+            }
+
+            #trip-page form input,
+            #trip-page form label,
+            #trip-page form textarea,
+            #trip-page form button {
+                grid-column: span 1 !important;
+            }
+
+            /* Mobile: Reduce modal padding and adjust title */
+            #trip-page h3 {
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+            }
+
+            #trip-page .form-container {
+                padding: 20px;
+                max-height: 90vh;
+                margin: 10px;
+            }
+
+            #trip-page form {
+                gap: 15px;
+            }
+
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="day-background"></div>
+
+    <div id="time-toggle">🔁</div>
+
+    <div id="splash">
+        <img src="logo.png" class="splash-logo" alt="Travel Logo">
+        <h2 class="splash-title">GREATER & BETTER</h2>
+        <p class="splash-sub">TRAVEL AGENCY</p>
+    </div>
+
+    <section id="trip-page">
+        <div class="close-btn" id="close-trip-page">×</div>
+        <h3>Select Visa Type to Proceed</h3>
+        <div class="form-container">
+            <p style="margin-bottom: 20px;">Please fill out your details to start planning. Selecting a visa type will
+                guide our recommendations.</p>
+            <form id="trip-form">
+                <input type="text" name="visaType" placeholder="Desired Visa Type (e.g., Tourist, Business)" required
+                    style="grid-column: span 2;">
+                <input type="text" name="fullName" placeholder="Full Name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="phone" placeholder="Phone">
+                <input type="text" name="destination" placeholder="Destination" required>
+                <input type="text" name="departureCity" placeholder="Departure City" required>
+
+                <label>Take Off Day*
+                    <input type="date" name="takeOffDay" required>
+                </label>
+                <label>Return Date
+                    <input type="date" name="returnDate">
+                </label>
+
+                <label style="grid-column: span 1;">Number of People*
+                    <input type="number" name="people" min="1" value="1" required>
+                </label>
+
+                <textarea name="preferences" placeholder="Preferences (hotels, flights, tours...)" rows="3"></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </section>
+
+
+    <div id="main-content">
+        <nav id="nav-links">
+            <a href="#destinations">Destinations</a>
+            <a href="#stories">Stories</a>
+            <a href="#highlights">Highlights</a>
+            <a href="#newsletter">Contact</a>
+            <!-- <a href="#">Sign in</a> (Phase 2) -->
+        </nav>
+        <div id="menu-toggle">☰</div>
+
+        <!-- TOAST NOTIFICATION CONTAINER -->
+        <div id="toast-container"></div>
+
+        <style>
+            /* Toast Styles */
+            #toast-container {
+                position: fixed;
+                bottom: 30px;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 6000;
+                display: flex;
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .toast {
+                background: rgba(0, 0, 0, 0.9);
+                color: white;
+                padding: 15px 25px;
+                border-radius: 50px;
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+                font-size: 1rem;
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                opacity: 0;
+                transform: translateY(20px);
+                transition: all 0.4s ease;
+                min-width: 300px;
+                justify-content: center;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .toast.show {
+                opacity: 1;
+                transform: translateY(0);
+            }
+
+            .toast.success {
+                border-left: 4px solid #4CAF50;
+            }
+
+            .toast.error {
+                border-left: 4px solid #f44336;
+            }
+        </style>
+
+        <section class="hero">
+            <div class="hero-content">
+
+                <div class="hero-nav-container">
+                    <img src="logo.png" alt="Travel Logo"
+                        style="width: 150px; border-radius: 15px; margin-bottom: 20px;">
+                    <h3
+                        style="color: rgb(255, 255, 255); font-family: 'Playfair Display', serif; font-size: 2rem; margin-bottom: 5px;">
+                        GREATER & BETTER</h3>
+                    <p style="color: rgb(255, 178, 36); font-size: 1rem; letter-spacing: 3px;">TRAVEL AGENCY</p>
+                </div>
+
+                <div class="hero-text-content">
+                    <h2>Discover the World's <span style="color:#d1a340;">Hidden Wonders</span></h2>
+                    <p>We plan personalized trips, handle your visa applications, and book flights & hotels—so you can
+                        focus on making memories.</p>
+                    <button id="plan-btn">Plan your trip</button>
+                </div>
+
+                <div class="hero-images">
+                    <img src="bridge.jpg" alt="Golden Gate Bridge">
+                    <img src="animal.jpeg" alt="Wildlife">
+                    <img src="Nature Landscape.jpg" alt="Nature Landscape">
+                    <img src="ama.jpg" alt="Beach sunset">
+                </div>
+
+            </div>
+        </section>
+
+
+        <section id="destinations" class="section destination-background">
+            <h3>Top Destinations</h3>
+            <div class="destinations">
+                <div class="card"><img src="Golden Bridge.jpg" alt="Golden Bridge">
+                    <div class="info">
+                        <h4>Golden Bridge</h4>
+                        <p>Vietnam</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openTripPlanner('Dubrovnik')"><img src="Dubrovnik.jpg" alt="Dubrovnik">
+                    <div class="info">
+                        <h4>Dubrovnik</h4>
+                        <p>Croatia</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openTripPlanner('Cappadocia')"><img src="Cappadocia.jpg" alt="Cappadocia">
+                    <div class="info">
+                        <h4>Cappadocia</h4>
+                        <p>Turkey</p>
+                    </div>
+                </div>
+                <div class="card" onclick="openTripPlanner('Sydney Harbour')"><img src="Sydney Harbour.jpg"
+                        alt="Sydney Harbour">
+                    <div class="info">
+                        <h4>Sydney Harbour</h4>
+                        <p>Australia</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="stories" class="section stories destination-background">
+            <h3>Latest Stories</h3>
+            <div class="story"><img src="Los Angeles food.jpg" alt="LA Food">
+                <div>
+                    <h5>Los Angeles Food</h5>
+                    <p>10 must-try foods.</p>
+                </div>
+            </div>
+            <div class="story"><img src="market.jpg" alt="London Market">
+                <div>
+                    <h5>South London Markets</h5>
+                    <p>15 markets to explore.</p>
+                </div>
+            </div>
+            <div class="story"><img src="hotel.jpg" alt="Hotel">
+                <div>
+                    <h5>World Hotels</h5>
+                    <p>Save with points.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="highlights" class="section destination-background">
+            <h3>Trekker’s Highlights</h3>
+            <div class="highlight">
+                <img src="turkey.jpg" alt="Traveler">
+                <div>
+                    <h5>Maria Angelica</h5>
+                    <p>An unforgettable journey through Turkey.</p>
+                </div>
+            </div>
+            <div class="highlight">
+                <img src="sunset.jpg" alt="Sunset">
+                <div>
+                    <h5>Sunset from Bosphorus</h5>
+                    <p>Experience Istanbul’s golden hour cruise.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="newsletter" class="newsletter">
+            <h3>Get Your Travel Inspiration</h3>
+            <p>Straight to your inbox every week</p>
+            <form id="newsletter-form" style="display: inline;">
+                <input type="email" placeholder="Enter your email" required>
+                <button type="submit">Subscribe</button>
+            </form>
+        </section>
+
+        <footer>
+            <p>© 2024 GREATER & BETTER. All Rights Reserved.</p>
+        </footer>
+    </div>
+
+    <script>
+        // Mobile menu toggle
+        const toggle = document.getElementById('menu-toggle');
+        const nav = document.getElementById('nav-links');
+
+        toggle.addEventListener('click', () => {
+            nav.classList.toggle('active');
+        });
+
+        // Trip form reveal
+        const planBtn = document.getElementById("plan-btn");
+        const tripPage = document.getElementById("trip-page");
+        const closeTripPage = document.getElementById("close-trip-page");
+
+        // Function to open the planner, optionally with a destination pre-filled
+        function openTripPlanner(destination = '') {
+            tripPage.classList.add('active');
+            document.body.style.overflow = 'hidden';
+
+            if (destination) {
+                const destInput = document.querySelector('#trip-form input[name="destination"]');
+                if (destInput) {
+                    destInput.value = destination;
+                }
+            }
+        }
+
+        planBtn.addEventListener("click", () => openTripPlanner());
+
+        closeTripPage.addEventListener("click", () => {
+            tripPage.classList.remove('active');
+            document.body.style.overflow = '';
+        });
+
+
+        // ------------------ DAY/NIGHT TOGGLE SCRIPT ------------------
+        const dayBackground = document.getElementById('day-background');
+        const timeToggle = document.getElementById('time-toggle');
+
+        // Function that manually flips the background layer
+        function toggleBackground() {
+            // If opacity is 0 (night), change to 1 (day), otherwise change to 0
+            if (dayBackground.style.opacity === '0' || dayBackground.style.opacity === '') {
+                dayBackground.style.opacity = '1';
+                timeToggle.innerHTML = '🌞';
+            } else {
+                dayBackground.style.opacity = '0';
+                timeToggle.innerHTML = '🌙';
+            }
+        }
+
+        // Function to set the initial background based on the current system time
+        function setTimeBasedBackgroundOnLoad() {
+            const now = new Date();
+            const hour = now.getHours();
+            // 6 AM to 6 PM is daytime
+            const isDayTime = hour >= 6 && hour < 18;
+
+            if (isDayTime) {
+                dayBackground.style.opacity = '1';
+                timeToggle.innerHTML = '🌞';
+            } else {
+                dayBackground.style.opacity = '0';
+                timeToggle.innerHTML = '🌙';
+            }
+        }
+
+        // Listener for the toggle button click
+        timeToggle.addEventListener('click', toggleBackground);
+
+        // ------------------ TOAST FUNCTION ------------------
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            if (!container) return; // Guard clause
+
+            const toast = document.createElement('div');
+            toast.className = `toast ${type}`;
+
+            let icon = type === 'success' ? '✅' : '❌';
+            toast.innerHTML = `<span>${icon}</span> <span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            // Trigger animation
+            requestAnimationFrame(() => {
+                toast.classList.add('show');
+            });
+
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => {
+                    toast.remove();
+                }, 400); // Wait for fade out transition
+            }, 3000);
+        }
+
+        // ------------------ TRIP FORM SUBMISSION ------------------
+        const tripForm = document.getElementById('trip-form');
+
+        tripForm.addEventListener('submit', async (e) => {
+            e.preventDefault(); // Prevent default form submission (page reload)
+
+            // Get the submit button to toggle state
+            const submitBtn = tripForm.querySelector('button[type="submit"]');
+            const originalBtnText = submitBtn.innerHTML;
+
+            // 1. Show Loading State
+            submitBtn.disabled = true;
+            submitBtn.innerHTML = '⏳ Processing...';
+            submitBtn.style.opacity = '0.7';
+            submitBtn.style.cursor = 'not-allowed';
+
+            // 2. Gather data from the form
+            const formData = new FormData(tripForm);
+            const data = Object.fromEntries(formData.entries());
+
+            // 3. Send data to the backend
+            try {
+                const response = await fetch('http://localhost:3000/api/plan-trip', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Success!
+                    showToast(result.message, 'success');
+                    tripForm.reset();
+                    // Close the modal after a short delay
+                    setTimeout(() => {
+                        document.getElementById("trip-page").classList.remove('active');
+                        document.body.style.overflow = '';
+                    }, 1500);
+                } else {
+                    // Server returned an error
+                    showToast(result.message, 'error');
+                }
+            } catch (error) {
+                console.error('Error submitting form:', error);
+                showToast('Failed to connect to the server.', 'error');
+            } finally {
+                // 4. Reset Button State (Always runs, success or fail)
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = originalBtnText;
+                submitBtn.style.opacity = '1';
+                submitBtn.style.cursor = 'pointer';
+            }
+        });
+
+        // ------------------ NEWSLETTER SUBMISSION ------------------
+        const newsletterForm = document.getElementById('newsletter-form');
+        if (newsletterForm) {
+            newsletterForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                const emailInput = newsletterForm.querySelector('input[type="email"]');
+                const email = emailInput.value;
+
+                console.log(`Newsletter Subscription: ${email}`);
+                showToast('Subscribed successfully! Check your inbox.', 'success');
+                newsletterForm.reset();
+            });
+        }
+
+        // ------------------ SPLASH FADE SCRIPT ------------------
+        window.addEventListener("load", () => {
+            setTimeout(() => {
+                document.getElementById("splash").classList.add("hide");
+            }, 2000);
+
+            // Initial check for day/night background when the page loads
+            setTimeBasedBackgroundOnLoad();
+        });
+    </script>
+</body>
+
+</html>
