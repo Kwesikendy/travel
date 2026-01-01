@@ -26,7 +26,19 @@ const PORT = 3000;
 connectDB();
 
 // --- Security Middleware ---
-app.use(helmet()); // Add security headers
+// Configure Helmet with relaxed CSP for inline scripts/styles
+app.use(helmet({
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Allow inline styles and Google Fonts
+            fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow Google Fonts
+            imgSrc: ["'self'", "data:", "https:"], // Allow images
+            connectSrc: ["'self'"] // Allow API calls to same origin
+        }
+    }
+}));
 
 // Rate limiting for login attempts
 const loginLimiter = rateLimit({
