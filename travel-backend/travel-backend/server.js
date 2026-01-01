@@ -65,13 +65,9 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
 // --- API Routes ---
-// Apply rate limiting to auth routes
-app.use('/api/auth/login', loginLimiter);
-app.use('/api/auth/register', loginLimiter);
-
-// Mount routes
+// Mount routes first
 app.use('/api/auth', authRoutes);
-app.use('/api/trips', apiLimiter, tripRoutes);
+app.use('/api/trips', tripRoutes);
 
 // 3. Test Route
 app.get('/api/test', (req, res) => {
