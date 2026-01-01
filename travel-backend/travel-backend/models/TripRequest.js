@@ -69,9 +69,9 @@ const tripRequestSchema = new mongoose.Schema({
 });
 
 // Update 'updatedAt' on save
-tripRequestSchema.pre('save', function (next) {
+tripRequestSchema.pre('save', function () {
     this.updatedAt = Date.now();
-    next();
+
 });
 
 module.exports = mongoose.model('TripRequest', tripRequestSchema);
