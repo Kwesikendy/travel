@@ -486,6 +486,262 @@
             color: white;
         }
 
+        /* ------------------ LOGIN/SIGNUP MODAL (NEW) ------------------ */
+        #auth-modal {
+            position: fixed;
+            inset: 0;
+            z-index: 5000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        #auth-modal.active {
+            display: flex;
+        }
+
+        /* Animated background overlay with gradient */
+        #auth-modal::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.7) 0%, rgba(26, 26, 46, 0.85) 100%);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            z-index: -1;
+            animation: fadeIn 0.4s ease;
+        }
+
+        /* Floating particles animation */
+        #auth-modal::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background-image:
+                radial-gradient(circle at 20% 50%, rgba(209, 163, 64, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.08) 0%, transparent 50%),
+                radial-gradient(circle at 40% 20%, rgba(209, 163, 64, 0.06) 0%, transparent 50%);
+            animation: particleFloat 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        @keyframes particleFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+                opacity: 0.6;
+            }
+
+            50% {
+                transform: translateY(-20px) scale(1.1);
+                opacity: 0.8;
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+        /* Modal container */
+        .auth-container {
+            background: rgba(255, 255, 255, 0.98);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            max-width: 450px;
+            width: 100%;
+            padding: 40px;
+            box-shadow:
+                0 20px 60px rgba(0, 0, 0, 0.5),
+                0 0 100px rgba(209, 163, 64, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            position: relative;
+            animation: slideUp 0.5s ease;
+        }
+
+        @keyframes slideUp {
+            from {
+                transform: translateY(30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        /* Close button */
+        .auth-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            width: 36px;
+            height: 36px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.05);
+            border: none;
+            border-radius: 50%;
+            color: #666;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .auth-close:hover {
+            background: rgba(209, 163, 64, 0.2);
+            color: #d1a340;
+            transform: rotate(90deg);
+        }
+
+        /* Header */
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h2 {
+            color: #1a1a2e;
+            font-family: 'Playfair Display', serif;
+            font-size: 2rem;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, #d1a340 0%, #f4c542 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .auth-header p {
+            color: #666;
+            font-size: 0.95rem;
+        }
+
+        /* Tab switcher */
+        .auth-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            background: rgba(0, 0, 0, 0.03);
+            padding: 6px;
+            border-radius: 12px;
+        }
+
+        .auth-tab {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            background: transparent;
+            color: #666;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+        }
+
+        .auth-tab.active {
+            background: linear-gradient(135deg, #d1a340 0%, #f4c542 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(209, 163, 64, 0.3);
+        }
+
+        /* Form */
+        .auth-form {
+            display: none;
+        }
+
+        .auth-form.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .auth-form label {
+            display: block;
+            margin-bottom: 20px;
+        }
+
+        .auth-form label span {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #555;
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .auth-form input {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid #e0e0e0;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        .auth-form input:focus {
+            outline: none;
+            border-color: #d1a340;
+            box-shadow: 0 0 0 3px rgba(209, 163, 64, 0.1);
+        }
+
+        .auth-form button {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #d1a340 0%, #f4c542 100%);
+            color: #1a1a2e;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 8px 20px rgba(209, 163, 64, 0.3);
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .auth-form button:hover:not(:disabled) {
+            background: linear-gradient(135deg, #f4c542 0%, #d1a340 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 12px 30px rgba(209, 163, 64, 0.5);
+        }
+
+        .auth-form button:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+        }
+
+        /* Error message */
+        .auth-error {
+            background: rgba(244, 67, 54, 0.1);
+            border-left: 4px solid #f44336;
+            padding: 12px 16px;
+            border-radius: 8px;
+            color: #c62828;
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+            display: none;
+        }
+
+        .auth-error.show {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
         /* ------------------ TRIP FORM (New Page Simulation) ------------------ */
         #trip-page {
             position: fixed;
@@ -842,6 +1098,55 @@
 
     <div id="time-toggle">🔁</div>
 
+    <!-- LOGIN/SIGNUP MODAL -->
+    <section id="auth-modal">
+        <div class="auth-container">
+            <button class="auth-close" id="close-auth-modal">×</button>
+
+            <div class="auth-header">
+                <h2>Welcome Back</h2>
+                <p>Sign in to manage your trips</p>
+            </div>
+
+            <div class="auth-tabs">
+                <button class="auth-tab active" data-tab="login">Login</button>
+                <button class="auth-tab" data-tab="signup">Sign Up</button>
+            </div>
+
+            <div class="auth-error" id="auth-error"></div>
+
+            <!-- Login Form -->
+            <form class="auth-form active" id="login-form">
+                <label>
+                    <span>Email</span>
+                    <input type="email" name="email" placeholder="your@email.com" required>
+                </label>
+                <label>
+                    <span>Password</span>
+                    <input type="password" name="password" placeholder="••••••••" required>
+                </label>
+                <button type="submit">Login</button>
+            </form>
+
+            <!-- Signup Form -->
+            <form class="auth-form" id="signup-form">
+                <label>
+                    <span>Full Name</span>
+                    <input type="text" name="name" placeholder="John Doe" required>
+                </label>
+                <label>
+                    <span>Email</span>
+                    <input type="email" name="email" placeholder="your@email.com" required>
+                </label>
+                <label>
+                    <span>Password</span>
+                    <input type="password" name="password" placeholder="••••••••" minlength="8" required>
+                </label>
+                <button type="submit">Create Account</button>
+            </form>
+        </div>
+    </section>
+
     <div id="splash">
         <img src="logo.PNG" class="splash-logo" alt="Travel Logo">
         <h2 class="splash-title">GREATER & BETTER</h2>
@@ -887,7 +1192,7 @@
             <a href="#stories">Stories</a>
             <a href="#highlights">Highlights</a>
             <a href="#newsletter">Contact</a>
-            <!-- <a href="#">Sign in</a> (Phase 2) -->
+            <a href="#" id="sign-in-btn">Sign In</a>
         </nav>
         <div id="menu-toggle">☰</div>
 
@@ -1230,6 +1535,171 @@
 
             // Initial check for day/night background when the page loads
             setTimeBasedBackgroundOnLoad();
+        });
+
+        // ------------------ AUTHENTICATION MODAL ------------------
+        const authModal = document.getElementById('auth-modal');
+        const closeAuthModal = document.getElementById('close-auth-modal');
+        const signInBtn = document.getElementById('sign-in-btn');
+        const authTabs = document.querySelectorAll('.auth-tab');
+        const authForms = document.querySelectorAll('.auth-form');
+        const authError = document.getElementById('auth-error');
+        const loginForm = document.getElementById('login-form');
+        const signupForm = document.getElementById('signup-form');
+
+        // Open auth modal
+        signInBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            authModal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+
+        // Close auth modal
+        closeAuthModal.addEventListener('click', () => {
+            authModal.classList.remove('active');
+            document.body.style.overflow = '';
+            hideAuthError();
+        });
+
+        // Tab switching
+        authTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.dataset.tab;
+
+                // Update active tab
+                authTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+
+                // Show corresponding form
+                authForms.forEach(form => {
+                    form.classList.remove('active');
+                    if (form.id === `${tabName}-form`) {
+                        form.classList.add('active');
+                    }
+                });
+
+                hideAuthError();
+            });
+        });
+
+        // Show error message
+        function showAuthError(message) {
+            authError.textContent = message;
+            authError.classList.add('show');
+        }
+
+        // Hide error message
+        function hideAuthError() {
+            authError.classList.remove('show');
+        }
+
+        // Login form submission
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAuthError();
+
+            const formData = new FormData(loginForm);
+            const data = {
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            const submitBtn = loginForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Logging in...';
+
+            try {
+                const response = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Save token to localStorage
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+
+                    showToast('Login successful! Welcome back.', 'success');
+                    authModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                    loginForm.reset();
+
+                    // Redirect to dashboard based on role
+                    setTimeout(() => {
+                        if (result.user.role === 'admin') {
+                            window.location.href = '/dashboard.html';
+                        } else {
+                            window.location.href = '/my-trips.html';
+                        }
+                    }, 1000);
+                } else {
+                    showAuthError(result.error || 'Login failed. Please try again.');
+                }
+            } catch (error) {
+                console.error('Login error:', error);
+                showAuthError('Failed to connect to server.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Login';
+            }
+        });
+
+        // Signup form submission
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideAuthError();
+
+            const formData = new FormData(signupForm);
+            const data = {
+                name: formData.get('name'),
+                email: formData.get('email'),
+                password: formData.get('password')
+            };
+
+            const submitBtn = signupForm.querySelector('button[type="submit"]');
+            submitBtn.disabled = true;
+            submitBtn.textContent = '⏳ Creating account...';
+
+            try {
+                const response = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    // Save token to localStorage
+                    localStorage.setItem('token', result.token);
+                    localStorage.setItem('user', JSON.stringify(result.user));
+
+                    showToast('Account created successfully! Welcome aboard.', 'success');
+                    authModal.classList.remove('active');
+                    document.body.style.overflow = '';
+                    signupForm.reset();
+
+                    // Redirect to user dashboard
+                    setTimeout(() => {
+                        window.location.href = '/my-trips.html';
+                    }, 1000);
+                } else {
+                    if (result.errors && result.errors.length > 0) {
+                        showAuthError(result.errors[0].msg);
+                    } else {
+                        showAuthError(result.error || 'Signup failed. Please try again.');
+                    }
+                }
+            } catch (error) {
+                console.error('Signup error:', error);
+                showAuthError('Failed to connect to server.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.textContent = 'Create Account';
+            }
         });
     </script>
 </body>
