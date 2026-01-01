@@ -270,41 +270,157 @@
                 transform: rotate(360deg);
             }
         }
+
+        /* Animations */
+        @keyframes float {
+
+            0%,
+            100% {
+                transform: translateY(0);
+            }
+
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
+            }
+
+            50% {
+                box-shadow: 0 0 0 8px rgba(255, 193, 7, 0);
+            }
+        }
+
+        /* Animated Background */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(circle at 20% 50%, rgba(209, 163, 64, 0.1) 0%, transparent 50%),
+                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.08) 0%, transparent 50%);
+            animation: float 20s ease-in-out infinite;
+            z-index: -1;
+        }
+
+        /* Apply Animations */
+        header {
+            animation: slideIn 0.5s ease-out;
+        }
+
+        h1 {
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .subtitle {
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .trips-header {
+            animation: fadeIn 1s ease-out;
+        }
+
+        .stat-card {
+            animation: fadeIn 0.6s ease-out backwards;
+        }
+
+        .stat-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .stat-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .stat-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .trip-card {
+            animation: slideIn 0.5s ease-out backwards;
+        }
+
+        .trip-card:nth-child(1) {
+            animation-delay: 0.1s;
+        }
+
+        .trip-card:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .trip-card:nth-child(3) {
+            animation-delay: 0.3s;
+        }
+
+        .status-pending {
+            animation: pulse 2s ease-in-out infinite;
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <header>
-            <div class="logo">GREATER & BETTER</div>
+            <div class="logo">✈️ GREATER & BETTER</div>
             <div class="user-info">
-                <span class="user-name" id="user-name">Loading...</span>
-                <a href="/" class="btn btn-secondary">Home</a>
-                <button class="btn btn-secondary" id="logout-btn">Logout</button>
+                <span class="user-name" id="user-name">👤 Loading...</span>
+                <a href="/" class="btn btn-secondary">🏠 Home</a>
+                <button class="btn btn-secondary" id="logout-btn">🚪 Logout</button>
             </div>
         </header>
 
-        <h1>My Trips</h1>
+        <h1>✨ My Trips</h1>
         <p class="subtitle">Track and manage your travel requests</p>
 
         <div class="stats" id="stats">
             <div class="stat-card">
+                <div style="font-size: 2.5rem; margin-bottom: 12px;">🌍</div>
                 <div class="stat-label">Total Requests</div>
                 <div class="stat-value" id="total-trips">0</div>
             </div>
             <div class="stat-card">
+                <div style="font-size: 2.5rem; margin-bottom: 12px;">⏳</div>
                 <div class="stat-label">Pending</div>
                 <div class="stat-value" id="pending-trips">0</div>
             </div>
             <div class="stat-card">
+                <div style="font-size: 2.5rem; margin-bottom: 12px;">✅</div>
                 <div class="stat-label">Completed</div>
                 <div class="stat-value" id="completed-trips">0</div>
             </div>
         </div>
 
         <div class="trips-header">
-            <h2>Your Trip Requests</h2>
-            <a href="/" class="btn btn-primary">Plan New Trip</a>
+            <h2>🗺️ Your Trip Requests</h2>
+            <a href="/" class="btn btn-primary">➕ Plan New Trip</a>
         </div>
 
         <div id="trips-container">
@@ -325,7 +441,7 @@
         }
 
         // Display user name
-        document.getElementById('user-name').textContent = user.name || 'User';
+        document.getElementById('user-name').textContent = `👤 ${user.name || 'User'}`;
 
         // Logout
         document.getElementById('logout-btn').addEventListener('click', () => {
@@ -354,7 +470,7 @@
                 console.error('Error loading trips:', error);
                 document.getElementById('trips-container').innerHTML = `
                     <div class="empty-state">
-                        <h3>Failed to load trips</h3>
+                        <h3>❌ Failed to load trips</h3>
                         <p>Please try refreshing the page</p>
                     </div>
                 `;
@@ -373,9 +489,9 @@
             if (trips.length === 0) {
                 container.innerHTML = `
                     <div class="empty-state">
-                        <h3>No trips yet</h3>
+                        <h3>🧳 No trips yet</h3>
                         <p>Start planning your next adventure!</p>
-                        <a href="/" class="btn btn-primary">Plan Your First Trip</a>
+                        <a href="/" class="btn btn-primary">✈️ Plan Your First Trip</a>
                     </div>
                 `;
                 return;
@@ -387,26 +503,26 @@
                         <div class="trip-card">
                             <div class="trip-header">
                                 <div>
-                                    <div class="trip-destination">${trip.destination}</div>
-                                    <div class="trip-date">Requested on ${new Date(trip.createdAt).toLocaleDateString()}</div>
+                                    <div class="trip-destination">🌏 ${trip.destination}</div>
+                                    <div class="trip-date">📅 Requested on ${new Date(trip.createdAt).toLocaleDateString()}</div>
                                 </div>
                                 <span class="status-badge status-${trip.status}">${trip.status}</span>
                             </div>
                             <div class="trip-details">
                                 <div class="detail-item">
-                                    <span class="detail-label">Departure</span>
+                                    <span class="detail-label">🛫 Departure</span>
                                     <span class="detail-value">${trip.departureCity}</span>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="detail-label">Travel Date</span>
+                                    <span class="detail-label">📆 Travel Date</span>
                                     <span class="detail-value">${new Date(trip.takeOffDay).toLocaleDateString()}</span>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="detail-label">Travelers</span>
+                                    <span class="detail-label">👥 Travelers</span>
                                     <span class="detail-value">${trip.people} ${trip.people === 1 ? 'person' : 'people'}</span>
                                 </div>
                                 <div class="detail-item">
-                                    <span class="detail-label">Visa Type</span>
+                                    <span class="detail-label">📋 Visa Type</span>
                                     <span class="detail-value">${trip.visaType}</span>
                                 </div>
                             </div>
