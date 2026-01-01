@@ -1,5 +1,8 @@
 // server.js
 
+// Load environment variables
+require('dotenv').config();
+
 // 1. Import Dependencies
 const express = require('express');
 const bodyParser = require('body-parser');
@@ -7,9 +10,37 @@ const { Resend } = require('resend');
 const cors = require('cors'); // Added CORS
 const bcrypt = require('bcryptjs'); // For password hashing
 const jwt = require('jsonwebtoken'); // For user authentication tokens
+const connectDB = require('./config/database'); // Database connection
+const TripRequest = require('./models/TripRequest'); // Trip Request model
+const helmet = require('helmet'); // Security headers
+const rateLimit = require('express-rate-limit'); // Rate limiting
+
+// Import routes
+const authRoutes = require('./routes/auth');
+const tripRoutes = require('./routes/trips');
 
 const app = express();
 const PORT = 3000;
+
+// Connect to MongoDB
+connectDB();
+
+// --- Security Middleware ---
+app.use(helmet()); // Add security headers
+
+// Rate limiting for login attempts
+const loginLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 5, // 5 attempts
+    message: 'Too many login attempts. Please try again in 15 minutes.'
+});
+
+// General API rate limiting
+const apiLimiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 15 minutes
+    max: 100, // 100 requests per 15 minutes
+    message: 'Too many requests. Please try again later.'
+});
 
 // Enable CORS for all routes (allows frontend at a different port/file to communicate)
 app.use(cors());
@@ -17,68 +48,23 @@ app.use(cors());
 // Serve static files from 'public' folder (Frontend)
 app.use(express.static('public'));
 
-// --- Security and Configuration ---
-const SECRET_KEY = 'YOUR_SUPER_SECRET_KEY'; // **CRITICAL: REPLACE THIS WITH A LONG, COMPLEX, RANDOM STRING**
-
-// NOTE: For development, we are simulating email sending by logging to console.
-// In production, configure this with real credentials.
-// const transporter = nodemailer.createTransport({
-//     service: 'gmail', 
-//     auth: {
-//         user: 'YOUR_AGENCY_EMAIL@gmail.com',
-//         pass: 'YOUR_APP_PASSWORD'
-//     }
-// });
-
-// --- Simulated Database (Replace with a real database like MongoDB/PostgreSQL later) ---
-const users = [
-    {
-        email: 'test@example.com',
-        // Hashed password for 'password123' (created using bcrypt.hashSync('password123', 10))
-        passwordHash: '$2a$10$S4L.8/wzE8jXp4x2K/b/d.jP4.q.1s.c.o.e.b.l.O.z.R.W.l.p.H.B.c.M.',
-        name: 'Test User'
-    }
-];
-
-// 2. Setup Middleware
-// Middleware to parse incoming JSON data (like form submissions)
+// 2. Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// NOTE: If you are serving your HTML file from this server, uncomment the line below 
-// and ensure your HTML, CSS, and JS files are in a folder named 'public'.
-// app.use(express.static('public')); 
+// --- API Routes ---
+// Apply rate limiting to auth routes
+app.use('/api/auth/login', loginLimiter);
+app.use('/api/auth/register', loginLimiter);
 
-// Basic Test Route
-app.get('/', (req, res) => {
-    res.send('Greater & Better Travel Agency Back-end Server is running!');
+// Mount routes
+app.use('/api/auth', authRoutes);
+app.use('/api/trips', apiLimiter, tripRoutes);
+
+// 3. Test Route
+app.get('/api/test', (req, res) => {
+    res.json({ message: 'Backend is running!' });
 });
-
-// 3. API Endpoint for Login (Validation)
-app.post('/api/login', async (req, res) => {
-    const { email, password } = req.body;
-
-    const user = users.find(u => u.email === email);
-
-    // Check if user exists
-    if (!user) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials.' });
-    }
-
-    // Compare the provided password with the stored hash
-    const isMatch = await bcrypt.compare(password, user.passwordHash);
-
-    if (!isMatch) {
-        return res.status(401).json({ success: false, message: 'Invalid credentials.' });
-    }
-
-    // Generate a JWT token
-    const token = jwt.sign({ userId: user.email, name: user.name }, SECRET_KEY, { expiresIn: '1h' });
-
-    // Send token back to the client
-    res.status(200).json({ success: true, message: 'Login successful!', token });
-});
-
 
 // 4. API Endpoint for Trip Submission (Email Sending)
 // 4. API Endpoint for Trip Submission (Email Sending)
@@ -86,8 +72,8 @@ app.post('/api/plan-trip', async (req, res) => {
     const formData = req.body;
     console.log('Received Trip Plan Request:', formData);
 
-    // Initialize Resend with API key
-    const resend = new Resend('re_SjbSEvkm_D8thYh6VonZhDPV72RJAJQWK');
+    // Initialize Resend with API key from environment
+    const resend = new Resend(process.env.RESEND_API_KEY);
 
     // 1. Email to AGENCY (The Lead)
     const agencyEmail = {
@@ -133,20 +119,41 @@ app.post('/api/plan-trip', async (req, res) => {
     };
 
     try {
-        // Send agency email via Resend (non-blocking)
+        // 1. Save trip request to database
+        const tripRequest = new TripRequest({
+            fullName: formData.fullName,
+            email: formData.email,
+            phone: formData.phone,
+            destination: formData.destination,
+            departureCity: formData.departureCity,
+            takeOffDay: formData.takeOffDay,
+            returnDate: formData.returnDate,
+            people: formData.people,
+            visaType: formData.visaType,
+            preferences: formData.preferences
+        });
+
+        await tripRequest.save();
+        console.log('✅ Trip request saved to database:', tripRequest._id);
+
+        // 2. Send agency email via Resend (non-blocking)
         resend.emails.send(agencyEmail)
             .then(() => console.log('✅ Agency email sent via Resend'))
             .catch(err => console.error('❌ Agency email failed:', err.message));
 
-        // Send customer email via Resend (non-blocking)
+        // 3. Send customer email via Resend (non-blocking)
         if (formData.email && formData.email.includes('@')) {
             resend.emails.send(customerEmail)
                 .then(() => console.log('✅ Customer email sent via Resend'))
                 .catch(err => console.error('❌ Customer email failed:', err.message));
         }
 
-        // Respond immediately
-        res.status(200).json({ success: true, message: 'Trip request received! Check your email.' });
+        // 4. Respond immediately
+        res.status(200).json({
+            success: true,
+            message: 'Trip request received! Check your email.',
+            requestId: tripRequest._id
+        });
     } catch (error) {
         console.error('❌ Error:', error);
         res.status(500).json({ success: false, message: 'Failed to process request.' });
