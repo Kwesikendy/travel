@@ -24,12 +24,27 @@ router.get('/', authenticateToken, requireAdmin, async (req, res) => {
 });
 
 // @route   GET /api/trips/my
-// @desc    Get current user's trip requests
+// @desc    Get current user's trip requests (matches by userId OR email)
 // @access  Private
 router.get('/my', authenticateToken, async (req, res) => {
     try {
-        const trips = await TripRequest.find({ userId: req.user._id })
-            .sort({ createdAt: -1 });
+        // Find trips by userId OR by email (to catch trips made before account creation)
+        const trips = await TripRequest.find({
+            $or: [
+                { userId: req.user._id },
+                { email: req.user.email }
+            ]
+        }).sort({ createdAt: -1 });
+
+        // Update trips that don't have userId but match email
+        const updatePromises = trips
+            .filter(trip => !trip.userId)
+            .map(trip => {
+                trip.userId = req.user._id;
+                return trip.save();
+            });
+
+        await Promise.all(updatePromises);
 
         res.json({
             success: true,

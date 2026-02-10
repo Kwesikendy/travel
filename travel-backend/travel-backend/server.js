@@ -28,17 +28,14 @@ connectDB();
 // --- Security Middleware ---
 // Configure Helmet with relaxed CSP for inline scripts/styles
 app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'"], // Allow inline scripts
-            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"], // Allow inline styles and Google Fonts
-            fontSrc: ["'self'", "https://fonts.gstatic.com"], // Allow Google Fonts
-            imgSrc: ["'self'", "data:", "https:"], // Allow images
-            connectSrc: ["'self'"] // Allow API calls to same origin
-        }
-    }
+    contentSecurityPolicy: false // Disable CSP to allow inline event handlers
 }));
+
+// FORCE REMOVE CSP HEADER to be absolutely sure
+app.use((req, res, next) => {
+    res.removeHeader("Content-Security-Policy");
+    next();
+});
 
 // Rate limiting for login attempts
 const loginLimiter = rateLimit({
@@ -75,59 +72,12 @@ app.get('/api/test', (req, res) => {
 });
 
 // 4. API Endpoint for Trip Submission (Email Sending)
-// 4. API Endpoint for Trip Submission (Email Sending)
 app.post('/api/plan-trip', async (req, res) => {
     const formData = req.body;
-    console.log('Received Trip Plan Request:', formData);
-
-    // Initialize Resend with API key from environment
-    const resend = new Resend(process.env.RESEND_API_KEY);
-
-    // 1. Email to AGENCY (The Lead)
-    const agencyEmail = {
-        from: 'Greater & Better Travel <onboarding@resend.dev>',
-        to: 'dogbeynathan7@gmail.com',
-        subject: `✈️ NEW TRIP LEAD: ${formData.destination || 'Unspecified'} (${formData.fullName})`,
-        html: `
-            <h2>New Trip Request!</h2>
-            <p><strong>Traveler:</strong> ${formData.fullName}</p>
-            <p><strong>Email:</strong> ${formData.email}</p>
-            <p><strong>Phone:</strong> ${formData.phone}</p>
-            <p><strong>Destination:</strong> ${formData.destination}</p>
-            <p><strong>Departure City:</strong> ${formData.departureCity}</p>
-            <p><strong>Dates:</strong> ${formData.takeOffDay} to ${formData.returnDate}</p>
-            <p><strong>People:</strong> ${formData.people}</p>
-            <p><strong>Visa Type:</strong> ${formData.visaType}</p>
-            <p><strong>Preferences:</strong><br>${formData.preferences}</p>
-        `
-    };
-
-    // 2. Email to CUSTOMER (The Confirmation)
-    const customerEmail = {
-        from: 'Greater & Better Travel <onboarding@resend.dev>',
-        to: formData.email,
-        subject: `Trip Request Received: ${formData.destination}`,
-        html: `
-            <div style="font-family: Arial, sans-serif; color: #333;">
-                <h1 style="color: #d1a340;">Thank you for choosing Greater & Better!</h1>
-                <p>Hi ${formData.fullName},</p>
-                <p>We have received your request to plan a trip to <strong>${formData.destination}</strong>.</p>
-                <p>Our travel specialists are reviewing your details and will get back to you shortly with a personalized itinerary.</p>
-                <hr style="border: 0; border-top: 1px solid #eee;">
-                <h3>Your Request Details:</h3>
-                <ul>
-                    <li><strong>Destination:</strong> ${formData.destination}</li>
-                    <li><strong>Dates:</strong> ${formData.takeOffDay} to ${formData.returnDate}</li>
-                    <li><strong>Travelers:</strong> ${formData.people}</li>
-                    <li><strong>Preferences:</strong> ${formData.preferences || 'None'}</li>
-                </ul>
-                <p>Warm regards,<br>The Greater & Better Team</p>
-            </div>
-        `
-    };
+    console.log('📝 Received Trip Plan Request:', formData);
 
     try {
-        // 1. Save trip request to database
+        // 1. Save trip request to database FIRST (most important)
         const tripRequest = new TripRequest({
             fullName: formData.fullName,
             email: formData.email,
@@ -144,29 +94,129 @@ app.post('/api/plan-trip', async (req, res) => {
         await tripRequest.save();
         console.log('✅ Trip request saved to database:', tripRequest._id);
 
-        // 2. Send agency email via Resend (non-blocking)
-        resend.emails.send(agencyEmail)
-            .then(() => console.log('✅ Agency email sent via Resend'))
-            .catch(err => console.error('❌ Agency email failed:', err.message));
+        // 2. Try to send emails (non-critical, won't block response)
+        const emailResults = await sendTripEmails(formData);
 
-        // 3. Send customer email via Resend (non-blocking)
-        if (formData.email && formData.email.includes('@')) {
-            resend.emails.send(customerEmail)
-                .then(() => console.log('✅ Customer email sent via Resend'))
-                .catch(err => console.error('❌ Customer email failed:', err.message));
-        }
-
-        // 4. Respond immediately
+        // 3. Respond to user
         res.status(200).json({
             success: true,
-            message: 'Trip request received! Check your email.',
-            requestId: tripRequest._id
+            message: 'Trip request received! Check your email for confirmation.',
+            requestId: tripRequest._id,
+            emailStatus: emailResults
         });
     } catch (error) {
-        console.error('❌ Error:', error);
-        res.status(500).json({ success: false, message: 'Failed to process request.' });
+        console.error('❌ Error processing trip request:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to process request. Please try again.'
+        });
     }
 });
+
+// Helper function to send emails
+async function sendTripEmails(formData) {
+    const results = {
+        agencyEmail: { sent: false, error: null },
+        customerEmail: { sent: false, error: null }
+    };
+
+    // Check if Resend API key is configured
+    if (!process.env.RESEND_API_KEY) {
+        const error = 'Resend API key not configured';
+        console.error('❌ Email Error:', error);
+        results.agencyEmail.error = error;
+        results.customerEmail.error = error;
+        return results;
+    }
+
+    try {
+        const resend = new Resend(process.env.RESEND_API_KEY);
+
+        // 1. Email to AGENCY (The Lead)
+        const agencyEmail = {
+            from: process.env.EMAIL_FROM || 'Greater & Better Travel <onboarding@resend.dev>',
+            to: process.env.ADMIN_EMAIL || 'dogbeynathan7@gmail.com',
+            subject: `✈️ NEW TRIP LEAD: ${formData.destination || 'Unspecified'} (${formData.fullName})`,
+            html: `
+                <h2>New Trip Request!</h2>
+                <p><strong>Traveler:</strong> ${formData.fullName}</p>
+                <p><strong>Email:</strong> ${formData.email}</p>
+                <p><strong>Phone:</strong> ${formData.phone}</p>
+                <p><strong>Destination:</strong> ${formData.destination}</p>
+                <p><strong>Departure City:</strong> ${formData.departureCity}</p>
+                <p><strong>Dates:</strong> ${formData.takeOffDay} to ${formData.returnDate}</p>
+                <p><strong>People:</strong> ${formData.people}</p>
+                <p><strong>Visa Type:</strong> ${formData.visaType}</p>
+                <p><strong>Preferences:</strong><br>${formData.preferences}</p>
+            `
+        };
+
+        // 2. Email to CUSTOMER (The Confirmation)
+        const customerEmail = {
+            from: process.env.EMAIL_FROM || 'Greater & Better Travel <onboarding@resend.dev>',
+            to: formData.email,
+            subject: `Trip Request Received: ${formData.destination}`,
+            html: `
+                <div style="font-family: Arial, sans-serif; color: #333;">
+                    <h1 style="color: #d1a340;">Thank you for choosing Greater & Better!</h1>
+                    <p>Hi ${formData.fullName},</p>
+                    <p>We have received your request to plan a trip to <strong>${formData.destination}</strong>.</p>
+                    <p>Our travel specialists are reviewing your details and will get back to you shortly with a personalized itinerary.</p>
+                    <hr style="border: 0; border-top: 1px solid #eee;">
+                    <h3>Your Request Details:</h3>
+                    <ul>
+                        <li><strong>Destination:</strong> ${formData.destination}</li>
+                        <li><strong>Dates:</strong> ${formData.takeOffDay} to ${formData.returnDate}</li>
+                        <li><strong>Travelers:</strong> ${formData.people}</li>
+                        <li><strong>Preferences:</strong> ${formData.preferences || 'None'}</li>
+                    </ul>
+                    <p>Warm regards,<br>The Greater & Better Team</p>
+                </div>
+            `
+        };
+
+        // Send agency email
+        try {
+            const agencyResult = await resend.emails.send(agencyEmail);
+            console.log('✅ Agency email sent successfully:', agencyResult);
+            results.agencyEmail.sent = true;
+        } catch (error) {
+            console.error('❌ Agency email failed:', error.message);
+            console.error('Full error:', error);
+            results.agencyEmail.error = error.message;
+        }
+
+        // Send customer email
+        if (formData.email && formData.email.includes('@')) {
+            try {
+                const customerResult = await resend.emails.send(customerEmail);
+                console.log('✅ Customer email sent successfully:', customerResult);
+                results.customerEmail.sent = true;
+            } catch (error) {
+                console.error('❌ Customer email failed:', error.message);
+                console.error('Full error:', error);
+                results.customerEmail.error = error.message;
+            }
+        } else {
+            results.customerEmail.error = 'Invalid email address';
+        }
+    } catch (error) {
+        console.error('❌ Email system error:', error.message);
+        console.error('Full error:', error);
+        results.agencyEmail.error = error.message;
+        results.customerEmail.error = error.message;
+    }
+
+    return results;
+}
+
+// Validate email configuration on startup
+if (!process.env.RESEND_API_KEY) {
+    console.warn('⚠️  WARNING: RESEND_API_KEY not found in environment variables!');
+    console.warn('⚠️  Emails will NOT be sent. Please add RESEND_API_KEY to your .env file.');
+    console.warn('⚠️  Get your API key from: https://resend.com/api-keys');
+}
+
 
 
 // 5. Start the Server

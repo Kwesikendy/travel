@@ -8,6 +8,7 @@
     <link
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
+    <link rel="icon" href="logo.PNG" type="image/png">
     <style>
         * {
             margin: 0;
@@ -258,6 +259,15 @@
             color: #fff;
             font-size: 0.9rem;
             cursor: pointer;
+            color: #000;
+            /* Make text black for visibility */
+            background: #fff;
+            /* Make background white for contrast */
+        }
+
+        .status-select option {
+            color: #000;
+            background: #fff;
         }
 
         .trip-details {
@@ -449,6 +459,7 @@
                 }
 
                 const data = await response.json();
+                console.log('Loaded trips from server:', data);
                 allTrips = data.trips;
                 displayTrips(allTrips);
                 updateStats(allTrips);
@@ -458,6 +469,7 @@
                     <div class="empty-state">
                         <h3>❌ Failed to load trips</h3>
                         <p>Please try refreshing the page</p>
+                        <p style="font-size: 0.8rem; opacity: 0.7;">${error.message}</p>
                     </div>
                 `;
             }
@@ -498,12 +510,12 @@
                                     </div>
                                 </div>
                                 <div class="trip-actions">
-                                    <select class="status-select" data-id="${trip._id}" onchange="updateStatus('${trip._id}', this.value)">
+                                    <select class="status-select" data-id="${trip._id}" data-original-value="${trip.status}">
                                         <option value="pending" ${trip.status === 'pending' ? 'selected' : ''}>⏳ Pending</option>
                                         <option value="contacted" ${trip.status === 'contacted' ? 'selected' : ''}>📞 Contacted</option>
                                         <option value="completed" ${trip.status === 'completed' ? 'selected' : ''}>✅ Completed</option>
                                     </select>
-                                    <button class="btn btn-danger" onclick="deleteTrip('${trip._id}')">🗑️ Delete</button>
+                                    <button class="btn btn-danger delete-btn" data-id="${trip._id}">🗑️ Delete</button>
                                 </div>
                             </div>
                             <div class="trip-details">
@@ -542,7 +554,11 @@
 
         // Update trip status
         async function updateStatus(tripId, newStatus) {
+            const selectElement = document.querySelector(`select[data-id="${tripId}"]`);
+            const originalStatus = selectElement.getAttribute('data-original-value') || 'pending';
+
             try {
+                selectElement.disabled = true;
                 const response = await fetch(`/api/trips/${tripId}`, {
                     method: 'PUT',
                     headers: {
@@ -553,17 +569,43 @@
                 });
 
                 if (response.ok) {
+                    const data = await response.json();
+
                     // Update local data
                     const trip = allTrips.find(t => t._id === tripId);
                     if (trip) trip.status = newStatus;
 
-                    // Refresh display
-                    filterTrips(currentFilter);
-                    updateStats(allTrips);
+                    // Update the original value so we know what to revert to if next change fails
+                    selectElement.setAttribute('data-original-value', newStatus);
+
+                    // RE-FETCH ALL DATA from server to prove it is live
+                    await loadTrips();
+
+                    // Show small toast instead of alert for better UX
+                    const toast = document.createElement('div');
+                    toast.textContent = '✅ Status updated';
+                    toast.style.position = 'fixed';
+                    toast.style.bottom = '20px';
+                    toast.style.right = '20px';
+                    toast.style.background = '#4caf50';
+                    toast.style.color = 'white';
+                    toast.style.padding = '10px 20px';
+                    toast.style.borderRadius = '5px';
+                    toast.style.zIndex = '1000';
+                    document.body.appendChild(toast);
+                    setTimeout(() => toast.remove(), 3000);
+
+                } else {
+                    const errorData = await response.json();
+                    console.error('Update failed response:', errorData);
+                    throw new Error(errorData.error || 'Server rejected update');
                 }
             } catch (error) {
                 console.error('Error updating status:', error);
-                alert('Failed to update status');
+                alert(`❌ Failed to update status: ${error.message}`);
+                selectElement.value = originalStatus; // Revert
+            } finally {
+                selectElement.disabled = false;
             }
         }
 
@@ -617,6 +659,20 @@
             btn.addEventListener('click', () => {
                 filterTrips(btn.dataset.filter);
             });
+        });
+
+        // Initialize event delegation
+        document.getElementById('trips-container').addEventListener('change', (e) => {
+            if (e.target.classList.contains('status-select')) {
+                updateStatus(e.target.dataset.id, e.target.value);
+            }
+        });
+
+        document.getElementById('trips-container').addEventListener('click', (e) => {
+            const deleteBtn = e.target.closest('.delete-btn');
+            if (deleteBtn) {
+                deleteTrip(deleteBtn.dataset.id);
+            }
         });
 
         // Load trips on page load
