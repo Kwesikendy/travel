@@ -27,15 +27,21 @@ connectDB();
 
 // --- Security Middleware ---
 // Configure Helmet with relaxed CSP for inline scripts/styles
+// Configure Helmet with strict CSP
 app.use(helmet({
-    contentSecurityPolicy: false // Disable CSP to allow inline event handlers
+    contentSecurityPolicy: {
+        directives: {
+            defaultSrc: ["'self'"],
+            scriptSrc: ["'self'"], // Scripts only from self (no inline)
+            styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (legacy code)
+            imgSrc: ["'self'", "data:"], // Allow images from self and data URIs
+            connectSrc: ["'self'"], // API calls to self
+            fontSrc: ["'self'", "https:", "data:"],
+            objectSrc: ["'none'"],
+            upgradeInsecureRequests: [],
+        },
+    },
 }));
-
-// FORCE REMOVE CSP HEADER to be absolutely sure
-app.use((req, res, next) => {
-    res.removeHeader("Content-Security-Policy");
-    next();
-});
 
 // Rate limiting for login attempts
 const loginLimiter = rateLimit({
