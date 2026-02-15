@@ -29,24 +29,35 @@
             color: #333333;
             line-height: 1.6;
             overflow-x: hidden;
-
-            /* NIGHT background (Assuming you renamed your file) */
-            background: url('background-night.jpg') no-repeat center center fixed;
-            background-size: cover;
-
             min-height: 100vh;
+            position: relative;
+        }
+
+        /* Fixed background container - iOS Safari compatible */
+        body::after {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background: url('background-night.jpg') no-repeat center center;
+            background-size: cover;
+            z-index: -2;
+            /* iOS Safari fix: use transform instead of fixed */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         /* Layer for the Day Background (initially transparent) */
         #day-background {
             position: fixed;
             inset: 0;
-            background: url('background-day.jpg') no-repeat center center fixed;
+            background: url('background-day.jpg') no-repeat center center;
             background-size: cover;
             z-index: -2;
             opacity: 0;
             transition: opacity 2s ease-in-out;
-            /* Smooth fade transition */
+            /* iOS Safari fix */
+            -webkit-transform: translateZ(0);
+            transform: translateZ(0);
         }
 
         /* Create a full-screen, subtle dark overlay for better text contrast overall */
