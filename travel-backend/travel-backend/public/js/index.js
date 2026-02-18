@@ -103,6 +103,18 @@ document.addEventListener('DOMContentLoaded', () => {
     // Check every minute to update automatically without refresh
     setInterval(updateCreateBackground, 60000);
 
+    // NEW: Check for 'plan' query parameter to open modal automatically
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('plan') === 'true') {
+        // slight delay to ensure everything is loaded/rendered
+        setTimeout(() => {
+            openTripPlanner();
+        }, 500);
+
+        // Optional: Clean up URL
+        window.history.replaceState({}, document.title, "/");
+    }
+
     // ------------------ TOAST FUNCTION ------------------
     function showToast(message, type = 'success') {
         const container = document.getElementById('toast-container');

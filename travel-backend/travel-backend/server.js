@@ -141,7 +141,7 @@ async function sendTripEmails(formData) {
         // 1. Email to AGENCY (The Lead)
         const agencyEmail = {
             from: process.env.EMAIL_FROM || 'Greater & Better Travel <onboarding@resend.dev>',
-            to: process.env.ADMIN_EMAIL || 'dogbeynathan7@gmail.com',
+            to: process.env.ADMIN_EMAIL || 'greaterandbettertravelagency@gmail.com',
             subject: `✈️ NEW TRIP LEAD: ${formData.destination || 'Unspecified'} (${formData.fullName})`,
             html: `
                 <h2>New Trip Request!</h2>
