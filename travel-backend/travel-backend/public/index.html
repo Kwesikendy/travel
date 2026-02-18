@@ -10,6 +10,8 @@
         href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap"
         rel="stylesheet">
     <link rel="icon" href="logo.PNG" type="image/png">
+    <!-- FontAwesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         html {
@@ -1201,10 +1203,11 @@
 
     <div id="main-content">
         <nav id="nav-links">
+            <a href="#services">Services</a>
             <a href="#destinations">Destinations</a>
-            <a href="#stories">Stories</a>
-            <a href="#highlights">Highlights</a>
-            <a href="#newsletter">Contact</a>
+            <a href="#about">About Us</a>
+            <a href="#testimonials">Testimonials</a>
+            <a href="#contact">Contact Us</a>
             <a href="#" id="sign-in-btn">Sign In</a>
         </nav>
         <div id="menu-toggle">☰</div>
@@ -1255,6 +1258,141 @@
             .toast.error {
                 border-left: 4px solid #f44336;
             }
+
+            /* SERVICES SECTION */
+            .services-background {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                padding: 60px 20px;
+            }
+
+            .services-grid {
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 30px;
+                max-width: 1200px;
+                margin: 0 auto;
+            }
+
+            .service-card {
+                background: rgba(255, 255, 255, 0.15);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                border-radius: 20px;
+                padding: 40px 30px;
+                text-align: center;
+                transition: transform 0.3s ease, background 0.3s ease, box-shadow 0.3s ease;
+                color: white;
+                box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            }
+
+            .service-card:hover {
+                transform: translateY(-10px);
+                background: rgba(255, 255, 255, 0.25);
+                box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+            }
+
+            .service-card .icon {
+                font-size: 3.5rem;
+                margin-bottom: 20px;
+                text-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+                display: inline-block;
+                transition: transform 0.3s ease;
+            }
+
+            .service-card:hover .icon {
+                transform: scale(1.1);
+            }
+
+            .service-card h4 {
+                font-family: 'Playfair Display', serif;
+                font-size: 1.5rem;
+                margin-bottom: 15px;
+                color: #d1a340;
+                /* Gold */
+                letter-spacing: 0.5px;
+            }
+
+            .service-card p {
+                font-size: 1rem;
+                line-height: 1.6;
+                color: rgba(255, 255, 255, 0.9);
+            }
+
+            /* CONTACT SECTION */
+            .contact-wrapper {
+                display: flex;
+                flex-wrap: wrap;
+                gap: 50px;
+                max-width: 1000px;
+                margin: 0 auto;
+                justify-content: center;
+                padding: 20px;
+            }
+
+            .contact-info {
+                flex: 1;
+                min-width: 300px;
+                text-align: left;
+                color: white;
+            }
+
+            .contact-info h4 {
+                font-family: 'Playfair Display', serif;
+                font-size: 2rem;
+                margin-bottom: 20px;
+                color: #d1a340;
+            }
+
+            .contact-info .info-item {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 20px;
+                font-size: 1.1rem;
+            }
+
+            .contact-form-container {
+                flex: 1.5;
+                min-width: 300px;
+                background: rgba(255, 255, 255, 0.1);
+                padding: 30px;
+                border-radius: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .contact-form-container input,
+            .contact-form-container textarea {
+                width: 100%;
+                padding: 12px 15px;
+                margin-bottom: 15px;
+                background: rgba(255, 255, 255, 0.2);
+                border: 1px solid rgba(255, 255, 255, 0.3);
+                border-radius: 10px;
+                color: white;
+                font-family: 'Inter', sans-serif;
+            }
+
+            .contact-form-container input::placeholder,
+            .contact-form-container textarea::placeholder {
+                color: rgba(255, 255, 255, 0.7);
+            }
+
+            .contact-form-container button {
+                width: 100%;
+                padding: 12px;
+                background: #d1a340;
+                color: white;
+                border: none;
+                border-radius: 10px;
+                font-weight: bold;
+                cursor: pointer;
+                transition: background 0.3s ease;
+            }
+
+            .contact-form-container button:hover {
+                background: #b88b2e;
+            }
         </style>
 
         <section class="hero">
@@ -1283,6 +1421,49 @@
                     <img src="ama.jpg" alt="Beach sunset">
                 </div>
 
+            </div>
+        </section>
+
+
+        <section id="services" class="section services-background">
+            <h3
+                style="text-align: center; font-family: 'Playfair Display', serif; color: white; font-size: 2.5rem; margin-bottom: 50px; text-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                Our Premium Services</h3>
+            <div class="services-grid">
+                <!-- Visa Applications -->
+                <div class="service-card">
+                    <div class="icon"><i class="fa-solid fa-passport"></i></div>
+                    <h4>Visa Applications</h4>
+                    <p>Hassle-free visa processing for all major destinations. We navigate the complexities so you don't
+                        have to.</p>
+                </div>
+                <!-- Hotel Reservations -->
+                <div class="service-card">
+                    <div class="icon"><i class="fa-solid fa-hotel"></i></div>
+                    <h4>Hotel Reservations</h4>
+                    <p>From luxury resorts to boutique stays, we secure the best accommodations at exclusive rates
+                        worldwide.</p>
+                </div>
+                <!-- Passport Application -->
+                <div class="service-card">
+                    <div class="icon"><i class="fa-solid fa-id-card"></i></div>
+                    <h4>Passport Application</h4>
+                    <p>Expedited passport services to ensure your travel documents are ready when adventure calls.</p>
+                </div>
+                <!-- Study Abroad -->
+                <div class="service-card">
+                    <div class="icon"><i class="fa-solid fa-graduation-cap"></i></div>
+                    <h4>Study Abroad</h4>
+                    <p>Unlock global opportunities with our comprehensive guidance for international education and
+                        student visas.</p>
+                </div>
+                <!-- Holiday Planning -->
+                <div class="service-card">
+                    <div class="icon"><i class="fa-solid fa-umbrella-beach"></i></div>
+                    <h4>Holiday Planning</h4>
+                    <p>Tailor-made itineraries for your dream vacation. We craft every detail for an unforgettable
+                        experience.</p>
+                </div>
             </div>
         </section>
 
@@ -1317,53 +1498,117 @@
             </div>
         </section>
 
-        <section id="stories" class="section stories destination-background">
-            <h3>Latest Stories</h3>
-            <div class="story"><img src="Los Angeles food.jpg" alt="LA Food">
-                <div>
-                    <h5>Los Angeles Food</h5>
-                    <p>10 must-try foods.</p>
-                </div>
-            </div>
-            <div class="story"><img src="market.jpg" alt="London Market">
-                <div>
-                    <h5>South London Markets</h5>
-                    <p>15 markets to explore.</p>
-                </div>
-            </div>
-            <div class="story"><img src="hotel.jpg" alt="Hotel">
-                <div>
-                    <h5>World Hotels</h5>
-                    <p>Save with points.</p>
-                </div>
-            </div>
-        </section>
-
-        <section id="highlights" class="section destination-background">
-            <h3>Trekker’s Highlights</h3>
-            <div class="highlight">
-                <img src="turkey.jpg" alt="Traveler">
-                <div>
-                    <h5>Maria Angelica</h5>
-                    <p>An unforgettable journey through Turkey.</p>
-                </div>
-            </div>
-            <div class="highlight">
-                <img src="sunset.jpg" alt="Sunset">
-                <div>
-                    <h5>Sunset from Bosphorus</h5>
-                    <p>Experience Istanbul’s golden hour cruise.</p>
+        <section id="about" class="section services-background">
+            <h3
+                style="text-align: center; font-family: 'Playfair Display', serif; color: white; font-size: 2.5rem; margin-bottom: 40px; text-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                About Us</h3>
+            <div class="about-container"
+                style="max-width: 1000px; margin: 0 auto; text-align: center; color: white; padding: 20px;">
+                <h4 style="font-size: 1.8rem; margin-bottom: 20px; color: #d1a340;">Your Trusted Travel Partner</h4>
+                <p style="font-size: 1.1rem; line-height: 1.8; margin-bottom: 30px;">
+                    At <strong>Greater & Better Travel Agency</strong>, we believe that travel is not just about moving
+                    from one place to another—it's about the memories you create and the experiences that shape you.
+                    Established with a vision to make global exploration accessible and hassle-free, we specialize in
+                    comprehensive travel solutions tailored to your unique needs.
+                </p>
+                <div class="about-stats"
+                    style="display: flex; justify-content: space-around; flex-wrap: wrap; gap: 20px; margin-top: 40px;">
+                    <div class="stat-item">
+                        <span style="font-size: 2.5rem; font-weight: bold; color: #d1a340;">5+</span>
+                        <p>Years Experience</p>
+                    </div>
+                    <div class="stat-item">
+                        <span style="font-size: 2.5rem; font-weight: bold; color: #d1a340;">1000+</span>
+                        <p>Visas Approved</p>
+                    </div>
+                    <div class="stat-item">
+                        <span style="font-size: 2.5rem; font-weight: bold; color: #d1a340;">500+</span>
+                        <p>Happy Travelers</p>
+                    </div>
                 </div>
             </div>
         </section>
 
-        <section id="newsletter" class="newsletter">
-            <h3>Get Your Travel Inspiration</h3>
-            <p>Straight to your inbox every week</p>
-            <form id="newsletter-form" style="display: inline;">
-                <input type="email" placeholder="Enter your email" required>
-                <button type="submit">Subscribe</button>
-            </form>
+        <section id="testimonials" class="section destination-background">
+            <h3
+                style="text-align: center; font-family: 'Playfair Display', serif; color: white; font-size: 2.5rem; margin-bottom: 40px; text-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                What Our Clients Say</h3>
+            <div class="services-grid"> <!-- Reusing grid for consistent layout -->
+                <!-- Testimonial 1 -->
+                <div class="service-card" style="text-align: left;">
+                    <div class="icon" style="font-size: 1.2rem; color: #FFD700;">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                            class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                            class="fa-solid fa-star"></i>
+                    </div>
+                    <h4>Akua Asante</h4>
+                    <p style="font-style: italic;">"Greater & Better made my study abroad application so smooth! I got
+                        my visa approved in record time and they helped me find great accommodation."</p>
+                </div>
+                <!-- Testimonial 2 -->
+                <div class="service-card" style="text-align: left;">
+                    <div class="icon" style="font-size: 1.2rem; color: #FFD700;">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                            class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                            class="fa-solid fa-star"></i>
+                    </div>
+                    <h4>Kwame Mensah</h4>
+                    <p style="font-style: italic;">"The holiday package they planned for our anniversary was perfect.
+                        Every hotel was top-notch and the itinerary was exactly what we wanted."</p>
+                </div>
+                <!-- Testimonial 3 -->
+                <div class="service-card" style="text-align: left;">
+                    <div class="icon" style="font-size: 1.2rem; color: #FFD700;">
+                        <i class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                            class="fa-solid fa-star"></i><i class="fa-solid fa-star"></i><i
+                            class="fa-solid fa-star"></i>
+                    </div>
+                    <h4>Ama Osei</h4>
+                    <p style="font-style: italic;">"I was struggling with my passport renewal, but their team handled it
+                        effortlessly. Highly recommended for anyone needing fast travel services!"</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="section services-background">
+            <h3
+                style="text-align: center; font-family: 'Playfair Display', serif; color: white; font-size: 2.5rem; margin-bottom: 40px; text-shadow: 0 2px 5px rgba(0,0,0,0.3);">
+                Contact Us</h3>
+            <div class="contact-wrapper">
+
+                <!-- Contact Info -->
+                <div class="contact-info">
+                    <h4>Get in Touch</h4>
+                    <p style="margin-bottom: 30px; line-height: 1.6;">We'd love to hear from you. Fill out the form or
+                        reach us directly.</p>
+                    <div class="info-item">
+                        <i class="fa-solid fa-phone" style="color: #d1a340; font-size: 1.5rem;"></i>
+                        <span>+233 54 771 5342</span>
+                    </div>
+                    <div class="info-item">
+                        <i class="fa-solid fa-envelope" style="color: #d1a340; font-size: 1.5rem;"></i>
+                        <span>greaterandbettertravelagency@gmail.com</span>
+                    </div>
+                </div>
+
+                <!-- Contact Form -->
+                <div class="contact-form-container">
+                    <form id="contact-form">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <input type="text" name="firstName" placeholder="First Name" required>
+                            <input type="text" name="lastName" placeholder="Last Name" required>
+                        </div>
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                            <input type="tel" name="phone" placeholder="Phone Number" required>
+                            <input type="email" name="email" placeholder="Email Address" required>
+                        </div>
+                        <input type="text" name="subject" placeholder="Subject" required>
+                        <textarea name="message" placeholder="Your Message..." required
+                            style="height: 120px; resize: none;"></textarea>
+                        <button type="submit">Send Message</button>
+                    </form>
+                </div>
+            </div>
         </section>
 
         <footer>

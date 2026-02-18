@@ -7,6 +7,14 @@ document.addEventListener('DOMContentLoaded', () => {
         toggle.addEventListener('click', () => {
             nav.classList.toggle('active');
         });
+
+        // Auto-close menu when a link is clicked
+        const navLinks = nav.querySelectorAll('a');
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                nav.classList.remove('active');
+            });
+        });
     }
 
     // Trip form reveal
@@ -181,17 +189,28 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // ------------------ NEWSLETTER SUBMISSION ------------------
-    const newsletterForm = document.getElementById('newsletter-form');
-    if (newsletterForm) {
-        newsletterForm.addEventListener('submit', (e) => {
+    // ------------------ CONTACT FORM SUBMISSION ------------------
+    const contactForm = document.getElementById('contact-form');
+    if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
             e.preventDefault();
-            const emailInput = newsletterForm.querySelector('input[type="email"]');
-            const email = emailInput.value;
+            const formData = new FormData(contactForm);
+            const data = Object.fromEntries(formData.entries());
 
-            console.log(`Newsletter Subscription: ${email}`);
-            showToast('Subscribed successfully! Check your inbox.', 'success');
-            newsletterForm.reset();
+            console.log('📩 Contact Form Submitted:', data);
+
+            // Simulation of API call
+            const btn = contactForm.querySelector('button');
+            const originalText = btn.innerText;
+            btn.innerText = 'Sending...';
+            btn.disabled = true;
+
+            setTimeout(() => {
+                showToast(`Message sent! We'll get back to you shortly, ${data.firstName}.`, 'success');
+                contactForm.reset();
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }, 1500);
         });
     }
 
@@ -203,8 +222,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 2000);
     }
 
-    // Initial check for day/night background when the page loads
-    setTimeBasedBackgroundOnLoad();
+
 
 
     // ------------------ AUTHENTICATION MODAL ------------------
