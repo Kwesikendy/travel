@@ -36,7 +36,7 @@ app.use(
             styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://unpkg.com"],
             fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com", "data:"],
             imgSrc: ["'self'", "data:", "https://images.unsplash.com"],
-            connectSrc: ["'self'"],
+            connectSrc: ["'self'", "https://cdn.jsdelivr.net"],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: [],
         },
@@ -224,6 +224,71 @@ if (!process.env.RESEND_API_KEY) {
 }
 
 
+
+// 6. API Endpoint for Contact Form
+app.post('/api/contact', async (req, res) => {
+    const formData = req.body;
+    console.log('📩 Received Contact Form Submission:', formData);
+
+    try {
+        const emailResult = await sendContactEmail(formData);
+
+        if (emailResult.success) {
+            res.status(200).json({
+                success: true,
+                message: 'Message sent successfully!'
+            });
+        } else {
+            res.status(500).json({
+                success: false,
+                message: 'Failed to send message. Please try again later.'
+            });
+        }
+    } catch (error) {
+        console.error('❌ Error processing contact form:', error);
+        res.status(500).json({
+            success: false,
+            message: 'An error occurred. Please try again later.'
+        });
+    }
+});
+
+// Helper function to send contact emails
+async function sendContactEmail(formData) {
+    if (!process.env.RESEND_API_KEY) {
+        console.error('❌ Resend API Key missing');
+        return { success: false, error: 'Configuration error' };
+    }
+
+    const resend = new Resend(process.env.RESEND_API_KEY);
+
+    try {
+        const { data, error } = await resend.emails.send({
+            from: process.env.EMAIL_FROM || 'Greater & Better Travel <onboarding@resend.dev>',
+            to: 'greaterandbettertravelagency@gmail.com',
+            subject: `📩 New Contact Message from ${formData.firstName} ${formData.lastName}`,
+            html: `
+                <h2>New Contact Message</h2>
+                <p><strong>Name:</strong> ${formData.firstName} ${formData.lastName}</p>
+                <p><strong>Email:</strong> ${formData.email}</p>
+                <p><strong>Phone:</strong> ${formData.phone}</p>
+                <p><strong>Message:</strong></p>
+                <p>${formData.message}</p>
+            `
+        });
+
+        if (error) {
+            console.error('❌ Resend Error:', error);
+            return { success: false, error: error };
+        }
+
+        console.log('✅ Contact email sent:', data);
+        return { success: true, data };
+    } catch (err) {
+        console.error('❌ Unexpected Email Error:', err);
+        return { success: false, error: err };
+    }
+}
 
 // 5. Start the Server
 app.listen(PORT, () => {

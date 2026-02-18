@@ -154,6 +154,11 @@ function displayTrips(trips) {
             ${trips.map(trip => createTripCard(trip)).join('')}
         </div>
     `;
+
+    // Re-initialize icons for the newly added content
+    if (typeof lucide !== 'undefined') {
+        lucide.createIcons();
+    }
 }
 
 function createTripCard(trip) {
@@ -203,6 +208,7 @@ function createTripCard(trip) {
                     </select>
                     <button class="btn btn-danger btn-sm delete-btn" data-id="${trip._id}">
                         <i data-lucide="trash-2" style="width: 14px; height: 14px;"></i>
+                        Delete
                     </button>
                 </div>
             </div>
@@ -445,6 +451,57 @@ document.getElementById('trips-container').addEventListener('click', (e) => {
     if (deleteBtn) {
         deleteTrip(deleteBtn.dataset.id);
     }
+});
+
+// ============================================
+// SIDEBAR TOGGLE FUNCTIONALITY
+// ============================================
+const sidebar = document.getElementById('sidebar');
+const sidebarToggle = document.getElementById('sidebar-toggle');
+const sidebarClose = document.getElementById('sidebar-close');
+const mainContent = document.querySelector('.main-content');
+
+// Create overlay element
+const overlay = document.createElement('div');
+overlay.className = 'sidebar-overlay';
+document.body.appendChild(overlay);
+
+function toggleSidebar() {
+    sidebar.classList.toggle('open');
+    // Overlay visibility is handled by CSS based on sidebar.open class sibling selector
+    // But for robustness/if CSS selector fails:
+    overlay.style.opacity = sidebar.classList.contains('open') ? '1' : '0';
+    overlay.style.visibility = sidebar.classList.contains('open') ? 'visible' : 'hidden';
+}
+
+function closeSidebar() {
+    sidebar.classList.remove('open');
+    overlay.style.opacity = '0';
+    overlay.style.visibility = 'hidden';
+}
+
+if (sidebarToggle) {
+    sidebarToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleSidebar();
+    });
+}
+
+if (sidebarClose) {
+    sidebarClose.addEventListener('click', closeSidebar);
+}
+
+if (overlay) {
+    overlay.addEventListener('click', closeSidebar);
+}
+
+// Close sidebar when clicking a nav link on mobile
+document.querySelectorAll('.nav-link').forEach(link => {
+    link.addEventListener('click', () => {
+        if (window.innerWidth <= 1024) {
+            closeSidebar();
+        }
+    });
 });
 
 // ============================================

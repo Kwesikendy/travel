@@ -192,25 +192,42 @@ document.addEventListener('DOMContentLoaded', () => {
     // ------------------ CONTACT FORM SUBMISSION ------------------
     const contactForm = document.getElementById('contact-form');
     if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+        contactForm.addEventListener('submit', async (e) => {
             e.preventDefault();
             const formData = new FormData(contactForm);
             const data = Object.fromEntries(formData.entries());
 
             console.log('📩 Contact Form Submitted:', data);
 
-            // Simulation of API call
             const btn = contactForm.querySelector('button');
             const originalText = btn.innerText;
             btn.innerText = 'Sending...';
             btn.disabled = true;
 
-            setTimeout(() => {
-                showToast(`Message sent! We'll get back to you shortly, ${data.firstName}.`, 'success');
-                contactForm.reset();
+            try {
+                const response = await fetch('/api/contact', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showToast(`Message sent! We'll get back to you shortly, ${data.firstName}.`, 'success');
+                    contactForm.reset();
+                } else {
+                    showToast(result.message || 'Failed to send message.', 'error');
+                }
+            } catch (error) {
+                console.error('Error sending message:', error);
+                showToast('Failed to connect to the server.', 'error');
+            } finally {
                 btn.innerText = originalText;
                 btn.disabled = false;
-            }, 1500);
+            }
         });
     }
 
