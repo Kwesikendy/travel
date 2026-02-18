@@ -7,6 +7,7 @@ require('dotenv').config();
 const express = require('express');
 const bodyParser = require('body-parser');
 const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const cors = require('cors'); // Added CORS
 const bcrypt = require('bcryptjs'); // For password hashing
 const jwt = require('jsonwebtoken'); // For user authentication tokens
