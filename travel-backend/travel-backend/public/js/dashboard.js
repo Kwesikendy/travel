@@ -505,6 +505,247 @@ document.querySelectorAll('.nav-link').forEach(link => {
 });
 
 // ============================================
+// NAVIGATION & VIEW SWITCHING
+// ============================================
+
+const views = {
+    dashboard: document.getElementById('trip-management-section'), // We need to add this ID to the section in HTML
+    customers: null, // Will be created dynamically
+    analytics: null, // Will be created dynamically
+    settings: null   // Will be created dynamically
+};
+
+// Add ID to the main trip section if not present (Done via JS for safety)
+const tripSection = document.querySelector('section');
+if (tripSection && !tripSection.id) tripSection.id = 'trip-management-section';
+
+// Container for dynamic views
+const mainContainer = document.querySelector('.main-content');
+
+function switchView(viewName) {
+    // 1. Update Sidebar Active State
+    document.querySelectorAll('.nav-link').forEach(link => {
+        link.classList.remove('active');
+        if (link.dataset.view === viewName) link.classList.add('active');
+    });
+
+    // 2. Hide all views
+    const sections = mainContainer.querySelectorAll('section');
+    sections.forEach(sec => sec.style.display = 'none');
+
+    // 3. Show or Create selected view
+    let targetView = document.getElementById(`${viewName}-section`);
+
+    if (!targetView) {
+        // Create view if it doesn't exist
+        targetView = document.createElement('section');
+        targetView.id = `${viewName}-section`;
+        targetView.className = 'fade-in';
+        mainContainer.appendChild(targetView);
+
+        // Render content based on view
+        if (viewName === 'analytics') renderAnalytics(targetView);
+        if (viewName === 'customers') renderCustomers(targetView);
+        if (viewName === 'settings') renderSettings(targetView);
+    } else {
+        targetView.style.display = 'block';
+        // Refresh content if needed
+        if (viewName === 'analytics') renderAnalytics(targetView);
+        if (viewName === 'customers') renderCustomers(targetView);
+    }
+
+    // Special case for Dashboard (it's the default existing section)
+    if (viewName === 'dashboard') {
+        const dashboardSec = document.getElementById('trip-management-section');
+        if (dashboardSec) dashboardSec.style.display = 'block';
+    }
+}
+
+// ============================================
+// VIEW RENDERERS
+// ============================================
+
+function renderAnalytics(container) {
+    // Calculate stats
+    const total = allTrips.length;
+    const completed = allTrips.filter(t => t.status === 'completed').length;
+    const pending = allTrips.filter(t => t.status === 'pending').length;
+    const contacted = allTrips.filter(t => t.status === 'contacted').length;
+
+    // Top Destinations
+    const destinations = {};
+    allTrips.forEach(t => {
+        destinations[t.destination] = (destinations[t.destination] || 0) + 1;
+    });
+    const sortedDest = Object.entries(destinations).sort((a, b) => b[1] - a[1]).slice(0, 5);
+
+    container.innerHTML = `
+        <div class="section-header">
+            <h2 class="section-title">Analytics Overview</h2>
+        </div>
+        
+        <div class="stats-grid">
+            <div class="stat-card" style="grid-column: span 1;">
+                <h3>Trip Status Distribution</h3>
+                <canvas id="statusChart"></canvas>
+            </div>
+            <div class="stat-card" style="grid-column: span 1;">
+                 <h3>Top Destinations</h3>
+                 <canvas id="destChart"></canvas>
+            </div>
+        </div>
+    `;
+
+    // Render Charts
+    const ctxStatus = document.getElementById('statusChart').getContext('2d');
+    new Chart(ctxStatus, {
+        type: 'doughnut',
+        data: {
+            labels: ['Pending', 'Contacted', 'Completed'],
+            datasets: [{
+                data: [pending, contacted, completed],
+                backgroundColor: ['#fbbf24', '#60a5fa', '#22c55e']
+            }]
+        }
+    });
+
+    const ctxDest = document.getElementById('destChart').getContext('2d');
+    new Chart(ctxDest, {
+        type: 'bar',
+        data: {
+            labels: sortedDest.map(d => d[0]),
+            datasets: [{
+                label: 'Requests',
+                data: sortedDest.map(d => d[1]),
+                backgroundColor: '#6366f1'
+            }]
+        },
+        options: {
+            scales: {
+                y: { beginAtZero: true, ticks: { stepSize: 1 } }
+            }
+        }
+    });
+}
+
+function renderCustomers(container) {
+    // Extract unique customers by email
+    const uniqueCustomers = {};
+    allTrips.forEach(trip => {
+        if (!uniqueCustomers[trip.email]) {
+            uniqueCustomers[trip.email] = {
+                name: trip.fullName,
+                email: trip.email,
+                phone: trip.phone || 'N/A',
+                trips: 0,
+                lastTrip: trip.createdAt
+            };
+        }
+        uniqueCustomers[trip.email].trips++;
+        if (new Date(trip.createdAt) > new Date(uniqueCustomers[trip.email].lastTrip)) {
+            uniqueCustomers[trip.email].lastTrip = trip.createdAt;
+        }
+    });
+
+    const customers = Object.values(uniqueCustomers);
+
+    container.innerHTML = `
+        <div class="section-header">
+            <h2 class="section-title">Customer Database (${customers.length})</h2>
+             <button class="btn btn-primary" onclick="alert('Feature coming soon!')">
+                <i data-lucide="mail"></i> Email All
+            </button>
+        </div>
+
+        <div class="trip-card">
+            <div style="overflow-x: auto;">
+                <table style="width: 100%; border-collapse: collapse; text-align: left;">
+                    <thead style="border-bottom: 2px solid var(--color-border);">
+                        <tr>
+                            <th style="padding: 12px;">Name</th>
+                            <th style="padding: 12px;">Email</th>
+                            <th style="padding: 12px;">Phone</th>
+                            <th style="padding: 12px;">Total Trips</th>
+                            <th style="padding: 12px;">Last Request</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${customers.map(c => `
+                            <tr style="border-bottom: 1px solid var(--color-border);">
+                                <td style="padding: 12px; font-weight: 600;">${c.name}</td>
+                                <td style="padding: 12px; color: var(--color-text-secondary);">${c.email}</td>
+                                <td style="padding: 12px;">${c.phone}</td>
+                                <td style="padding: 12px;">
+                                    <span class="status-badge completed" style="background: var(--color-bg-hover); color: var(--color-text-primary);">
+                                        ${c.trips}
+                                    </span>
+                                </td>
+                                <td style="padding: 12px;">${new Date(c.lastTrip).toLocaleDateString()}</td>
+                            </tr>
+                        `).join('')}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    `;
+
+    if (typeof lucide !== 'undefined') lucide.createIcons();
+}
+
+function renderSettings(container) {
+    container.innerHTML = `
+        <div class="section-header">
+             <h2 class="section-title">Settings</h2>
+        </div>
+        <div class="trip-card" style="max-width: 600px;">
+            <form onsubmit="event.preventDefault(); showToast('Success', 'Settings saved!', 'success');">
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Admin Name</label>
+                    <input type="text" value="${user.name || 'Admin'}" 
+                        style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: 6px;">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Admin Email</label>
+                    <input type="email" value="${user.email || ''}" disabled
+                        style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: 6px; background: var(--color-bg-hover);">
+                </div>
+                <div style="margin-bottom: 20px;">
+                    <label style="display: block; margin-bottom: 8px; font-weight: 600;">Notification Email</label>
+                    <input type="email" value="greaterandbettertravelagency@gmail.com" 
+                        style="width: 100%; padding: 10px; border: 1px solid var(--color-border); border-radius: 6px;">
+                </div>
+                <button class="btn btn-primary" type="submit">Save Changes</button>
+            </form>
+        </div>
+    `;
+}
+
+// Update Nav Links to use switchView
+document.querySelectorAll('.nav-link').forEach(link => {
+    // We need to add data-view attributes to sidebar links in HTML first
+    // Or map them by text content here
+    const text = link.querySelector('span').innerText.trim().toLowerCase();
+
+    // Manual mapping based on text
+    if (text === 'dashboard' || text === 'trip requests') link.dataset.view = 'dashboard';
+    if (text === 'analytics') link.dataset.view = 'analytics';
+    if (text === 'customers') link.dataset.view = 'customers';
+    if (text === 'settings') link.dataset.view = 'settings';
+
+    // Exclude logout and back to website
+    if (text === 'back to website' || text === 'logout') return;
+
+    link.addEventListener('click', (e) => {
+        e.preventDefault();
+        if (link.dataset.view) {
+            switchView(link.dataset.view);
+            // Close sidebar on mobile
+            if (window.innerWidth <= 1024) closeSidebar();
+        }
+    });
+});
+
+// ============================================
 // INITIALIZE
 // ============================================
 
