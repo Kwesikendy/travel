@@ -5,522 +5,177 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>My Trips - Greater & Better Travel</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:wght@700&display=swap"
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700&display=swap"
         rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/dashboard.css">
     <link rel="icon" href="logo.PNG" type="image/png">
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
 
-        body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-            min-height: 100vh;
-            color: #fff;
-            padding: 20px;
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-        }
-
-        /* Header */
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 0;
-            margin-bottom: 40px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .logo {
-            font-family: 'Playfair Display', serif;
-            font-size: 1.5rem;
-            background: linear-gradient(135deg, #d1a340 0%, #f4c542 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-        }
-
-        .user-name {
-            font-weight: 600;
-        }
-
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 8px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, #d1a340 0%, #f4c542 100%);
-            color: #1a1a2e;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(209, 163, 64, 0.3);
-        }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: #fff;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-        .btn-secondary:hover {
-            background: rgba(255, 255, 255, 0.15);
-        }
-
-        /* Dashboard Title */
-        h1 {
-            font-family: 'Playfair Display', serif;
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-        }
-
-        .subtitle {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 40px;
-        }
-
-        /* Stats Cards */
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 20px;
-            margin-bottom: 40px;
-        }
-
-        .stat-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .stat-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .stat-label {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-            margin-bottom: 8px;
-        }
-
-        .stat-value {
-            font-size: 2rem;
-            font-weight: 700;
-            background: linear-gradient(135deg, #d1a340 0%, #f4c542 100%);
-            -webkit-background-clip: text;
-            background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-
-        /* Trips Section */
-        .trips-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 24px;
-        }
-
-        .trips-grid {
-            display: grid;
-            gap: 20px;
-        }
-
-        .trip-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 16px;
-            padding: 24px;
-            transition: all 0.3s ease;
-        }
-
-        .trip-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
-        }
-
-        .trip-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: start;
-            margin-bottom: 16px;
-        }
-
-        .trip-destination {
-            font-size: 1.5rem;
-            font-weight: 700;
-            margin-bottom: 4px;
-        }
-
-        .trip-date {
-            color: rgba(255, 255, 255, 0.6);
-            font-size: 0.9rem;
-        }
-
-        .status-badge {
-            padding: 6px 12px;
-            border-radius: 20px;
-            font-size: 0.85rem;
-            font-weight: 600;
-            text-transform: uppercase;
-        }
-
-        .status-pending {
-            background: rgba(255, 193, 7, 0.2);
-            color: #ffc107;
-            border: 1px solid rgba(255, 193, 7, 0.3);
-        }
-
-        .status-contacted {
-            background: rgba(33, 150, 243, 0.2);
-            color: #2196f3;
-            border: 1px solid rgba(33, 150, 243, 0.3);
-        }
-
-        .status-completed {
-            background: rgba(76, 175, 80, 0.2);
-            color: #4caf50;
-            border: 1px solid rgba(76, 175, 80, 0.3);
-        }
-
-        .trip-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 16px;
-            margin-top: 16px;
-            padding-top: 16px;
-            border-top: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .detail-item {
-            display: flex;
-            flex-direction: column;
-            gap: 4px;
-        }
-
-        .detail-label {
-            color: rgba(255, 255, 255, 0.5);
-            font-size: 0.85rem;
-        }
-
-        .detail-value {
-            font-weight: 600;
-        }
-
-        /* Empty State */
-        .empty-state {
-            text-align: center;
-            padding: 60px 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 16px;
-            border: 2px dashed rgba(255, 255, 255, 0.1);
-        }
-
-        .empty-state h3 {
-            font-size: 1.5rem;
-            margin-bottom: 12px;
-        }
-
-        .empty-state p {
-            color: rgba(255, 255, 255, 0.6);
-            margin-bottom: 24px;
-        }
-
-        /* Loading */
-        .loading {
-            text-align: center;
-            padding: 60px 20px;
-        }
-
-        .spinner {
-            width: 50px;
-            height: 50px;
-            border: 4px solid rgba(255, 255, 255, 0.1);
-            border-top-color: #d1a340;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin: 0 auto 20px;
-        }
-
-        @keyframes spin {
-            to {
-                transform: rotate(360deg);
-            }
-        }
-
-        /* Animations */
-        @keyframes float {
-
-            0%,
-            100% {
-                transform: translateY(0);
-            }
-
-            50% {
-                transform: translateY(-10px);
-            }
-        }
-
-        @keyframes slideIn {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: scale(0.9);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1);
-            }
-        }
-
-        @keyframes pulse {
-
-            0%,
-            100% {
-                box-shadow: 0 0 0 0 rgba(255, 193, 7, 0.4);
-            }
-
-            50% {
-                box-shadow: 0 0 0 8px rgba(255, 193, 7, 0);
-            }
-        }
-
-        /* Animated Background */
-        body::before {
-            content: "";
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(circle at 20% 50%, rgba(209, 163, 64, 0.1) 0%, transparent 50%),
-                radial-gradient(circle at 80% 80%, rgba(255, 215, 0, 0.08) 0%, transparent 50%);
-            animation: float 20s ease-in-out infinite;
-            z-index: -1;
-        }
-
-        /* Apply Animations */
-        header {
-            animation: slideIn 0.5s ease-out;
-        }
-
-        h1 {
-            animation: fadeIn 0.6s ease-out;
-        }
-
-        .subtitle {
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        .trips-header {
-            animation: fadeIn 1s ease-out;
-        }
-
-        .stat-card {
-            animation: fadeIn 0.6s ease-out backwards;
-        }
-
-        .stat-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .stat-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .stat-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .trip-card {
-            animation: slideIn 0.5s ease-out backwards;
-        }
-
-        .trip-card:nth-child(1) {
-            animation-delay: 0.1s;
-        }
-
-        .trip-card:nth-child(2) {
-            animation-delay: 0.2s;
-        }
-
-        .trip-card:nth-child(3) {
-            animation-delay: 0.3s;
-        }
-
-        .status-pending {
-            animation: pulse 2s ease-in-out infinite;
-        }
-
-        /* Mobile Responsiveness */
-        @media (max-width: 768px) {
-            header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: 20px;
-                padding: 15px 0;
-            }
-
-            .header-content {
-                width: 100%;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-            }
-
-            .mobile-only {
-                display: block !important;
-            }
-
-            .user-info {
-                width: 100%;
-                flex-direction: column;
-                align-items: stretch;
-                gap: 10px;
-                display: none;
-                /* Hidden by default on mobile */
-            }
-
-            .user-info.active {
-                display: flex;
-                animation: slideIn 0.3s ease-out;
-            }
-
-            .user-name {
-                text-align: center;
-                margin-bottom: 10px;
-            }
-
-            .btn {
-                width: 100%;
-                text-align: center;
-                justify-content: center;
-            }
-
-            h1 {
-                font-size: 2rem;
-            }
-
-            .stats {
-                grid-template-columns: 1fr;
-            }
-
-            .trip-header {
-                flex-direction: column;
-                gap: 10px;
-            }
-
-            .trip-destination {
-                font-size: 1.25rem;
-            }
-
-            .trip-details {
-                grid-template-columns: 1fr 1fr;
-            }
-        }
-    </style>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
 </head>
 
 <body>
-    <div class="container">
-        <header>
-            <div class="header-content">
-                <div class="logo">✈️ GREATER & BETTER</div>
-                <button id="mobile-menu-toggle" class="btn-icon mobile-only"
-                    style="display: none; background: transparent; font-size: 1.5rem; color: white; border: none;">
-                    ☰
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="logo.PNG" alt="G&B Logo" style="height: 40px; border-radius: 8px;">
+                    <span>G&B Travel</span>
+                </div>
+                <!-- Mobile Close Button -->
+                <button id="sidebar-close" class="btn-icon">
+                    <i data-lucide="x"></i>
                 </button>
             </div>
-            <div class="user-info" id="user-nav">
-                <span class="user-name" id="user-name">👤 Loading...</span>
-                <a href="/" class="btn btn-secondary">🏠 Home</a>
-                <button class="btn btn-secondary" id="logout-btn">🚪 Logout</button>
-            </div>
-        </header>
 
-        <h1>✨ My Trips</h1>
-        <p class="subtitle">Track and manage your travel requests</p>
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span>My Trips</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="/?plan=true" class="nav-link">
+                            <i data-lucide="plus-circle"></i>
+                            <span>Plan New Trip</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
 
-        <div class="stats" id="stats">
-            <div class="stat-card">
-                <div style="font-size: 2.5rem; margin-bottom: 12px;">🌍</div>
-                <div class="stat-label">Total Requests</div>
-                <div class="stat-value" id="total-trips">0</div>
+            <div class="sidebar-footer">
+                <a href="/" class="nav-link">
+                    <i data-lucide="home"></i>
+                    <span>Back to Website</span>
+                </a>
+                <a href="#" class="nav-link" id="logout-btn">
+                    <i data-lucide="log-out"></i>
+                    <span>Logout</span>
+                </a>
             </div>
-            <div class="stat-card">
-                <div style="font-size: 2.5rem; margin-bottom: 12px;">⏳</div>
-                <div class="stat-label">Pending</div>
-                <div class="stat-value" id="pending-trips">0</div>
-            </div>
-            <div class="stat-card">
-                <div style="font-size: 2.5rem; margin-bottom: 12px;">✅</div>
-                <div class="stat-label">Completed</div>
-                <div class="stat-value" id="completed-trips">0</div>
-            </div>
-        </div>
+        </aside>
 
-        <div class="trips-header">
-            <h2>🗺️ Your Trip Requests</h2>
-            <a href="/?plan=true" class="btn btn-primary">➕ Plan New Trip</a>
-        </div>
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button id="sidebar-toggle" class="btn-icon">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div>
+                        <h1>My Trips</h1>
+                        <p class="header-subtitle">Track and manage your travel adventures</p>
+                    </div>
+                </div>
 
-        <div id="trips-container">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading your trips...</p>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span class="user-greeting">Welcome,</span>
+                        <span class="user-name" id="user-name">Traveler</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon combined">
+                        <i data-lucide="globe"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Requests</p>
+                        <h3 class="stat-value" id="total-trips">0</h3>
+                        <div class="stat-trend neutral">
+                            <i data-lucide="activity"></i>
+                            <span>Lifetime</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i data-lucide="clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Pending</p>
+                        <h3 class="stat-value" id="pending-trips">0</h3>
+                        <div class="stat-trend pending">
+                            <i data-lucide="loader"></i>
+                            <span>Awaiting action</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon completed">
+                        <i data-lucide="check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Completed</p>
+                        <h3 class="stat-value" id="completed-trips">0</h3>
+                        <div class="stat-trend success">
+                            <i data-lucide="check"></i>
+                            <span>Ready to go</span>
+                        </div>
+                    </div>
+                </div>
             </div>
-        </div>
+
+            <!-- Trips Section -->
+            <section class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Your Trip Requests</h2>
+                </div>
+
+                <div id="trips-container">
+                    <div class="loading-container">
+                        <div class="spinner"></div>
+                        <p>Loading your adventures...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
     </div>
 
+    <!-- Scripts -->
     <script src="js/my-trips.js"></script>
     <script>
-        // Mobile Menu Toggle
-        document.addEventListener('DOMContentLoaded', () => {
-            const mobileToggle = document.getElementById('mobile-menu-toggle');
-            const userNav = document.getElementById('user-nav');
+        // Sidebar Toggle Logic (Inline for simplicity, or could extract to shared js)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
 
-            if (mobileToggle && userNav) {
-                mobileToggle.addEventListener('click', () => {
-                    userNav.classList.toggle('active');
-                    mobileToggle.textContent = userNav.classList.contains('active') ? '✕' : '☰';
-                });
-            }
-        });
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.style.opacity = sidebar.classList.contains('open') ? '1' : '0';
+            overlay.style.visibility = sidebar.classList.contains('open') ? 'visible' : 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.style.opacity = '0';
+            overlay.style.visibility = 'hidden';
+        }
+
+        if (sidebarToggle) sidebarToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
+        if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+        if (overlay) overlay.addEventListener('click', closeSidebar);
     </script>
 </body>
 

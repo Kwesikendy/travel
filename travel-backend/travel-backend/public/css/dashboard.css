@@ -258,6 +258,11 @@ body::before {
     }
 }
 
+#sidebar-toggle {
+    display: none;
+    margin-right: var(--space-md);
+}
+
 .header-left h1 {
     font-family: var(--font-display);
     font-size: var(--text-3xl);
@@ -996,10 +1001,6 @@ body::before {
         grid-template-columns: repeat(2, 1fr);
     }
 
-    #sidebar-toggle {
-        display: flex !important;
-    }
-
     /* Sidebar Overlay */
     .sidebar-overlay {
         position: fixed;
@@ -1013,13 +1014,81 @@ body::before {
     }
 
     .sidebar.open~.sidebar-overlay {
-        /* Changed to general sibling or handled by JS */
         opacity: 1;
         visibility: visible;
     }
 
     #sidebar-close {
         display: flex !important;
+    }
+
+    /* Mobile Header Polish */
+    .dashboard-header {
+        position: sticky;
+        top: 0;
+        padding: var(--space-md);
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+        border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+        gap: var(--space-sm);
+    }
+
+    /* Fix Toggle Button */
+    #sidebar-toggle {
+        display: flex !important;
+        background: transparent;
+        border: none;
+        color: var(--color-text-primary);
+        padding: var(--space-xs);
+        margin-right: var(--space-xs);
+        width: 40px;
+        height: 40px;
+        align-items: center;
+        justify-content: center;
+        border-radius: var(--radius-md);
+        cursor: pointer;
+    }
+
+    #sidebar-toggle:active {
+        background: var(--color-bg-hover);
+    }
+
+    #sidebar-toggle i {
+        width: 24px;
+        height: 24px;
+    }
+
+    /* Compact Stats Grid */
+    .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+        /* 2 columns on mobile */
+        gap: var(--space-md);
+    }
+
+    .stat-card {
+        padding: var(--space-md);
+        /* Reduced padding */
+    }
+
+    .stat-icon {
+        width: 40px;
+        height: 40px;
+        font-size: 1.25rem;
+        margin-bottom: var(--space-sm);
+    }
+
+    .stat-value {
+        font-size: 1.5rem;
+    }
+
+    .stat-label {
+        font-size: var(--text-xs);
+    }
+
+    /* Hide Trend on very small screens to save space */
+    .stat-trend {
+        display: none;
     }
 }
 

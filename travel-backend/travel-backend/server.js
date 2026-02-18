@@ -119,6 +119,17 @@ app.post('/api/plan-trip', async (req, res) => {
     }
 });
 
+// Helper function to create transporter
+const createTransporter = () => {
+    return nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: process.env.EMAIL_USER,
+            pass: process.env.EMAIL_PASS
+        }
+    });
+};
+
 // Helper function to send emails
 async function sendTripEmails(formData) {
     const results = {
@@ -126,21 +137,20 @@ async function sendTripEmails(formData) {
         customerEmail: { sent: false, error: null }
     };
 
-    // Check if Resend API key is configured
-    if (!process.env.RESEND_API_KEY) {
-        const error = 'Resend API key not configured';
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        const error = 'Gmail credentials not configured';
         console.error('❌ Email Error:', error);
         results.agencyEmail.error = error;
         results.customerEmail.error = error;
         return results;
     }
 
-    try {
-        const resend = new Resend(process.env.RESEND_API_KEY);
+    const transporter = createTransporter();
 
+    try {
         // 1. Email to AGENCY (The Lead)
-        const agencyEmail = {
-            from: process.env.EMAIL_FROM || 'Greater & Better Travel <onboarding@resend.dev>',
+        const agencyMailOptions = {
+            from: `"Greater & Better Travel" <${process.env.EMAIL_USER}>`,
             to: process.env.ADMIN_EMAIL || 'greaterandbettertravelagency@gmail.com',
             subject: `✈️ NEW TRIP LEAD: ${formData.destination || 'Unspecified'} (${formData.fullName})`,
             html: `
@@ -157,58 +167,37 @@ async function sendTripEmails(formData) {
             `
         };
 
+        await transporter.sendMail(agencyMailOptions);
+        console.log('✅ Agency Notification Sent');
+        results.agencyEmail.sent = true;
+
         // 2. Email to CUSTOMER (The Confirmation)
-        const customerEmail = {
-            from: process.env.EMAIL_FROM || 'Greater & Better Travel <onboarding@resend.dev>',
+        const customerMailOptions = {
+            from: `"Greater & Better Travel" <${process.env.EMAIL_USER}>`,
             to: formData.email,
-            subject: `Trip Request Received: ${formData.destination}`,
+            subject: 'Trip Request Received! 🌍',
             html: `
                 <div style="font-family: Arial, sans-serif; color: #333;">
-                    <h1 style="color: #d1a340;">Thank you for choosing Greater & Better!</h1>
+                    <h1 style="color: #d1a340;">We've received your request!</h1>
                     <p>Hi ${formData.fullName},</p>
-                    <p>We have received your request to plan a trip to <strong>${formData.destination}</strong>.</p>
-                    <p>Our travel specialists are reviewing your details and will get back to you shortly with a personalized itinerary.</p>
-                    <hr style="border: 0; border-top: 1px solid #eee;">
-                    <h3>Your Request Details:</h3>
-                    <ul>
-                        <li><strong>Destination:</strong> ${formData.destination}</li>
-                        <li><strong>Dates:</strong> ${formData.takeOffDay} to ${formData.returnDate}</li>
-                        <li><strong>Travelers:</strong> ${formData.people}</li>
-                        <li><strong>Preferences:</strong> ${formData.preferences || 'None'}</li>
-                    </ul>
-                    <p>Warm regards,<br>The Greater & Better Team</p>
+                    <p>Thanks for choosing <strong>Greater & Better Travel</strong>. We are excited to help you plan your trip to <strong>${formData.destination}</strong>.</p>
+                    <p>Our team is reviewing your details and will get back to you shortly with a custom itinerary.</p>
+                    <hr>
+                    <p><small>If you have urgent questions, reply to this email.</small></p>
                 </div>
             `
         };
 
-        // Send agency email
-        try {
-            const agencyResult = await resend.emails.send(agencyEmail);
-            console.log('✅ Agency email sent successfully:', agencyResult);
-            results.agencyEmail.sent = true;
-        } catch (error) {
-            console.error('❌ Agency email failed:', error.message);
-            console.error('Full error:', error);
-            results.agencyEmail.error = error.message;
+        if (formData.email && formData.email.includes('@')) {
+            await transporter.sendMail(customerMailOptions);
+            console.log('✅ Customer Confirmation Sent');
+            results.customerEmail.sent = true;
+        } else {
+            results.customerEmail.error = 'Invalid email address for customer';
         }
 
-        // Send customer email
-        if (formData.email && formData.email.includes('@')) {
-            try {
-                const customerResult = await resend.emails.send(customerEmail);
-                console.log('✅ Customer email sent successfully:', customerResult);
-                results.customerEmail.sent = true;
-            } catch (error) {
-                console.error('❌ Customer email failed:', error.message);
-                console.error('Full error:', error);
-                results.customerEmail.error = error.message;
-            }
-        } else {
-            results.customerEmail.error = 'Invalid email address';
-        }
     } catch (error) {
-        console.error('❌ Email system error:', error.message);
-        console.error('Full error:', error);
+        console.error('❌ Email Sending Failed:', error);
         results.agencyEmail.error = error.message;
         results.customerEmail.error = error.message;
     }
@@ -254,39 +243,36 @@ app.post('/api/contact', async (req, res) => {
 });
 
 // Helper function to send contact emails
+// Helper function to send contact emails
 async function sendContactEmail(formData) {
-    if (!process.env.RESEND_API_KEY) {
-        console.error('❌ Resend API Key missing');
-        return { success: false, error: 'Configuration error' };
+    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+        console.error('❌ Email Error: Gmail credentials not configured');
+        return false;
     }
 
-    const resend = new Resend(process.env.RESEND_API_KEY);
+    const transporter = createTransporter();
 
     try {
-        const { data, error } = await resend.emails.send({
-            from: process.env.EMAIL_FROM || 'Greater & Better Travel <onboarding@resend.dev>',
-            to: 'greaterandbettertravelagency@gmail.com',
+        const mailOptions = {
+            from: `"Contact Form" <${process.env.EMAIL_USER}>`,
+            to: process.env.ADMIN_EMAIL || 'greaterandbettertravelagency@gmail.com',
+            replyTo: formData.email,
             subject: `📩 New Contact Message from ${formData.firstName} ${formData.lastName}`,
             html: `
-                <h2>New Contact Message</h2>
+                <h3>New Contact Message</h3>
                 <p><strong>Name:</strong> ${formData.firstName} ${formData.lastName}</p>
                 <p><strong>Email:</strong> ${formData.email}</p>
                 <p><strong>Phone:</strong> ${formData.phone}</p>
-                <p><strong>Message:</strong></p>
-                <p>${formData.message}</p>
+                <p><strong>Message:</strong><br>${formData.message}</p>
             `
-        });
+        };
 
-        if (error) {
-            console.error('❌ Resend Error:', error);
-            return { success: false, error: error };
-        }
-
-        console.log('✅ Contact email sent:', data);
-        return { success: true, data };
-    } catch (err) {
-        console.error('❌ Unexpected Email Error:', err);
-        return { success: false, error: err };
+        await transporter.sendMail(mailOptions);
+        console.log('✅ Contact Email Sent');
+        return { success: true };
+    } catch (error) {
+        console.error('❌ Contact Email Failed:', error);
+        return { success: false, error: error };
     }
 }
 
