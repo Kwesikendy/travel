@@ -40,7 +40,8 @@
             inset: 0;
             background: url('background-night.jpg') no-repeat center center;
             background-size: cover;
-            z-index: -2;
+            z-index: -3;
+            /* Night background at the very back */
             /* iOS Safari fix: use transform instead of fixed */
             -webkit-transform: translateZ(0);
             transform: translateZ(0);
@@ -53,6 +54,7 @@
             background: url('background-day.jpg') no-repeat center center;
             background-size: cover;
             z-index: -2;
+            /* Day background on top of Night */
             opacity: 0;
             transition: opacity 2s ease-in-out;
             /* iOS Safari fix */
@@ -68,6 +70,7 @@
             background: rgba(0, 0, 0, 0.4);
             /* Dark overlay */
             z-index: -1;
+            /* Overlay on top of both backgrounds */
         }
 
         /* ------------------ SPLASH SCREEN ------------------ */
@@ -1107,8 +1110,6 @@
 <body>
 
     <div id="day-background"></div>
-
-    <div id="time-toggle">🔁</div>
 
     <!-- LOGIN/SIGNUP MODAL -->
     <section id="auth-modal">

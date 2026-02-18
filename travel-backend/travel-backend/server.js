@@ -28,20 +28,20 @@ connectDB();
 // --- Security Middleware ---
 // Configure Helmet with relaxed CSP for inline scripts/styles
 // Configure Helmet with strict CSP
-app.use(helmet({
-    contentSecurityPolicy: {
+app.use(
+    helmet.contentSecurityPolicy({
         directives: {
             defaultSrc: ["'self'"],
-            scriptSrc: ["'self'"], // Scripts only from self (no inline)
-            styleSrc: ["'self'", "'unsafe-inline'"], // Allow inline styles (legacy code)
-            imgSrc: ["'self'", "data:"], // Allow images from self and data URIs
-            connectSrc: ["'self'"], // API calls to self
-            fontSrc: ["'self'", "https:", "data:"],
+            scriptSrc: ["'self'", "'unsafe-inline'", "https://cdn.jsdelivr.net", "https://unpkg.com", "https://cdnjs.cloudflare.com"],
+            styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdnjs.cloudflare.com", "https://unpkg.com"],
+            fontSrc: ["'self'", "https://fonts.gstatic.com", "https://cdnjs.cloudflare.com", "data:"],
+            imgSrc: ["'self'", "data:", "https://images.unsplash.com"],
+            connectSrc: ["'self'"],
             objectSrc: ["'none'"],
             upgradeInsecureRequests: [],
         },
-    },
-}));
+    })
+);
 
 // Rate limiting for login attempts
 const loginLimiter = rateLimit({

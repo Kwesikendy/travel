@@ -39,6 +39,11 @@
                     </div>
                     <span>G&B Travel</span>
                 </div>
+                <!-- Mobile Close Button -->
+                <button id="sidebar-close" class="btn-icon"
+                    style="display: none; margin-left: auto; color: var(--color-text-secondary);">
+                    <i class="fas fa-times"></i>
+                </button>
             </div>
 
             <nav>
@@ -93,9 +98,15 @@
         <main class="main-content">
             <!-- Header -->
             <header class="dashboard-header">
-                <div class="header-left">
-                    <h1>Trip Management</h1>
-                    <p class="header-subtitle">Manage and track all customer trip requests</p>
+                <div class="header-left" style="display: flex; align-items: center; gap: 15px;">
+                    <button id="sidebar-toggle" class="btn-icon"
+                        style="display: none; background: transparent; color: var(--color-text-primary); font-size: 1.2rem;">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <h1>Trip Management</h1>
+                        <p class="header-subtitle">Manage and track all customer trip requests</p>
+                    </div>
                 </div>
                 <div class="header-right">
                     <div class="user-menu">

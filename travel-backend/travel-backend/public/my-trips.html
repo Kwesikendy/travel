@@ -386,14 +386,87 @@
         .status-pending {
             animation: pulse 2s ease-in-out infinite;
         }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 20px;
+                padding: 15px 0;
+            }
+
+            .header-content {
+                width: 100%;
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+            }
+
+            .mobile-only {
+                display: block !important;
+            }
+
+            .user-info {
+                width: 100%;
+                flex-direction: column;
+                align-items: stretch;
+                gap: 10px;
+                display: none;
+                /* Hidden by default on mobile */
+            }
+
+            .user-info.active {
+                display: flex;
+                animation: slideIn 0.3s ease-out;
+            }
+
+            .user-name {
+                text-align: center;
+                margin-bottom: 10px;
+            }
+
+            .btn {
+                width: 100%;
+                text-align: center;
+                justify-content: center;
+            }
+
+            h1 {
+                font-size: 2rem;
+            }
+
+            .stats {
+                grid-template-columns: 1fr;
+            }
+
+            .trip-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .trip-destination {
+                font-size: 1.25rem;
+            }
+
+            .trip-details {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
     </style>
 </head>
 
 <body>
     <div class="container">
         <header>
-            <div class="logo">✈️ GREATER & BETTER</div>
-            <div class="user-info">
+            <div class="header-content">
+                <div class="logo">✈️ GREATER & BETTER</div>
+                <button id="mobile-menu-toggle" class="btn-icon mobile-only"
+                    style="display: none; background: transparent; font-size: 1.5rem; color: white; border: none;">
+                    ☰
+                </button>
+            </div>
+            <div class="user-info" id="user-nav">
                 <span class="user-name" id="user-name">👤 Loading...</span>
                 <a href="/" class="btn btn-secondary">🏠 Home</a>
                 <button class="btn btn-secondary" id="logout-btn">🚪 Logout</button>
@@ -435,6 +508,20 @@
     </div>
 
     <script src="js/my-trips.js"></script>
+    <script>
+        // Mobile Menu Toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const mobileToggle = document.getElementById('mobile-menu-toggle');
+            const userNav = document.getElementById('user-nav');
+
+            if (mobileToggle && userNav) {
+                mobileToggle.addEventListener('click', () => {
+                    userNav.classList.toggle('active');
+                    mobileToggle.textContent = userNav.classList.contains('active') ? '✕' : '☰';
+                });
+            }
+        });
+    </script>
 </body>
 
 </html>

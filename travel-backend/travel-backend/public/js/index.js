@@ -39,7 +39,22 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     if (planBtn) {
-        planBtn.addEventListener("click", () => openTripPlanner());
+        planBtn.addEventListener("click", () => {
+            const token = localStorage.getItem('token');
+
+            if (token) {
+                // User is logged in, open trip planner
+                openTripPlanner();
+            } else {
+                // User is NOT logged in, open auth modal
+                const authModal = document.getElementById('auth-modal');
+                if (authModal) {
+                    authModal.classList.add('active');
+                    document.body.style.overflow = 'hidden';
+                    showToast('Please login to plan your trip', 'info');
+                }
+            }
+        });
     }
 
     if (closeTripPage) {
@@ -50,42 +65,35 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
 
-    // ------------------ DAY/NIGHT TOGGLE SCRIPT ------------------
+    // ------------------ AUTOMATIC DAY/NIGHT BACKGROUND ------------------
     const dayBackground = document.getElementById('day-background');
-    const timeToggle = document.getElementById('time-toggle');
 
-    // Function that manually flips the background layer
-    function toggleBackground() {
-        // If opacity is 0 (night), change to 1 (day), otherwise change to 0
-        if (dayBackground.style.opacity === '0' || dayBackground.style.opacity === '') {
-            dayBackground.style.opacity = '1';
-            timeToggle.innerHTML = '🌞';
-        } else {
-            dayBackground.style.opacity = '0';
-            timeToggle.innerHTML = '🌙';
-        }
-    }
+    // Function to set the background based on current time (Day: 4am - 3pm)
+    function updateCreateBackground() {
+        // Guard clause in case element is missing
+        if (!dayBackground) return;
 
-    // Function to set the initial background based on the current system time
-    function setTimeBasedBackgroundOnLoad() {
         const now = new Date();
         const hour = now.getHours();
-        // 6 AM to 6 PM is daytime
-        const isDayTime = hour >= 6 && hour < 18;
+
+        // User requested: Morning (4am) till 3pm (15:00) is Day.
+        // After 3pm (15:00) till 4am is Night.
+        const isDayTime = hour >= 4 && hour < 15;
 
         if (isDayTime) {
+            // Day Mode
             dayBackground.style.opacity = '1';
-            timeToggle.innerHTML = '🌞';
         } else {
+            // Night Mode (Background behind is night by default)
             dayBackground.style.opacity = '0';
-            timeToggle.innerHTML = '🌙';
         }
     }
 
-    // Listener for the toggle button click
-    if (timeToggle) {
-        timeToggle.addEventListener('click', toggleBackground);
-    }
+    // Run on load
+    updateCreateBackground();
+
+    // Check every minute to update automatically without refresh
+    setInterval(updateCreateBackground, 60000);
 
     // ------------------ TOAST FUNCTION ------------------
     function showToast(message, type = 'success') {
@@ -210,11 +218,32 @@ document.addEventListener('DOMContentLoaded', () => {
     const signupForm = document.getElementById('signup-form');
 
     // Open auth modal
+    // Open auth modal or go to dashboard
     if (signInBtn) {
+        // Check auth state on load
+        const token = localStorage.getItem('token');
+        const userStr = localStorage.getItem('user');
+
+        if (token && userStr) {
+            try {
+                const user = JSON.parse(userStr);
+                signInBtn.textContent = 'My Dashboard';
+                signInBtn.href = user.role === 'admin' ? '/dashboard.html' : '/my-trips.html';
+                signInBtn.classList.add('logged-in'); // Optional hook for styling
+            } catch (e) {
+                console.error('Error parsing user data', e);
+            }
+        }
+
         signInBtn.addEventListener('click', (e) => {
-            e.preventDefault();
-            authModal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            const currentToken = localStorage.getItem('token');
+            if (!currentToken) {
+                // Only open modal if NOT logged in
+                e.preventDefault();
+                authModal.classList.add('active');
+                document.body.style.overflow = 'hidden';
+            }
+            // If logged in, let the link navigation happen (default behavior)
         });
     }
 
