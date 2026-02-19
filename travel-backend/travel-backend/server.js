@@ -124,58 +124,35 @@ app.post('/api/plan-trip', async (req, res) => {
     }
 });
 
-// Helper function to create transporter
-const createTransporter = () => {
-    return nodemailer.createTransport({
-        host: 'smtp.gmail.com',
-        port: 2525, // Changed port from 587/465 to 2525
-        secure: true,
-        auth: {
-            user: process.env.EMAIL_USER,
-            pass: process.env.EMAIL_PASS
-        },
-        family: 4, // Force IPv4 to avoid Render/Gmail IPv6 issues
-        pool: true, // Use pooled connections
-        maxConnections: 1,
-        rateLimit: 5,
-        connectionTimeout: 10000,
-        greetingTimeout: 5000,
-        socketTimeout: 10000
-    });
-};
+// Initialize SendGrid
+const sgMail = require('@sendgrid/mail');
+if (process.env.SENDGRID_API_KEY) {
+    sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+}
 
-// Verify SMTP connection on startup
-const transporter = createTransporter();
-transporter.verify((error, success) => {
-    if (error) {
-        console.error('❌ SMTP Connection Error:', error);
-    } else {
-        console.log('✅ SMTP Server Connection Established');
-    }
-});
-
-// Helper function to send emails
+// Helper function to send emails via SendGrid
 async function sendTripEmails(formData) {
     const results = {
         agencyEmail: { sent: false, error: null },
         customerEmail: { sent: false, error: null }
     };
 
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        const error = 'Gmail credentials not configured';
+    if (!process.env.SENDGRID_API_KEY) {
+        const error = 'SendGrid API Key not configured';
         console.error('❌ Email Error:', error);
         results.agencyEmail.error = error;
         results.customerEmail.error = error;
         return results;
     }
 
-    const transporter = createTransporter();
-
     try {
+        const adminEmail = process.env.ADMIN_EMAIL || 'greaterandbettertravelagency@gmail.com';
+        const senderEmail = 'greaterandbettertravelagency@gmail.com'; // Must be verified in SendGrid
+
         // 1. Email to AGENCY (The Lead)
-        const agencyMailOptions = {
-            from: `"Greater & Better Travel" <${process.env.EMAIL_USER}>`,
-            to: process.env.ADMIN_EMAIL || 'greaterandbettertravelagency@gmail.com',
+        const agencyMsg = {
+            to: adminEmail,
+            from: senderEmail,
             subject: `✈️ NEW TRIP LEAD: ${formData.destination || 'Unspecified'} (${formData.fullName})`,
             html: `
                 <h2>New Trip Request!</h2>
@@ -191,37 +168,38 @@ async function sendTripEmails(formData) {
             `
         };
 
-        await transporter.sendMail(agencyMailOptions);
-        console.log('✅ Agency Notification Sent');
+        await sgMail.send(agencyMsg);
+        console.log('✅ Agency Notification Sent via SendGrid');
         results.agencyEmail.sent = true;
 
         // 2. Email to CUSTOMER (The Confirmation)
-        const customerMailOptions = {
-            from: `"Greater & Better Travel" <${process.env.EMAIL_USER}>`,
-            to: formData.email,
-            subject: 'Trip Request Received! 🌍',
-            html: `
-                <div style="font-family: Arial, sans-serif; color: #333;">
-                    <h1 style="color: #d1a340;">We've received your request!</h1>
-                    <p>Hi ${formData.fullName},</p>
-                    <p>Thanks for choosing <strong>Greater & Better Travel</strong>. We are excited to help you plan your trip to <strong>${formData.destination}</strong>.</p>
-                    <p>Our team is reviewing your details and will get back to you shortly with a custom itinerary.</p>
-                    <hr>
-                    <p><small>If you have urgent questions, reply to this email.</small></p>
-                </div>
-            `
-        };
-
         if (formData.email && formData.email.includes('@')) {
-            await transporter.sendMail(customerMailOptions);
-            console.log('✅ Customer Confirmation Sent');
+            const customerMsg = {
+                to: formData.email,
+                from: senderEmail,
+                subject: 'Trip Request Received! 🌍',
+                html: `
+                    <div style="font-family: Arial, sans-serif; color: #333;">
+                        <h1 style="color: #d1a340;">We've received your request!</h1>
+                        <p>Hi ${formData.fullName},</p>
+                        <p>Thanks for choosing <strong>Greater & Better Travel</strong>. We are excited to help you plan your trip to <strong>${formData.destination}</strong>.</p>
+                        <p>Our team is reviewing your details and will get back to you shortly with a custom itinerary.</p>
+                    </div>
+                `
+            };
+
+            await sgMail.send(customerMsg);
+            console.log('✅ Customer Confirmation Sent via SendGrid');
             results.customerEmail.sent = true;
         } else {
             results.customerEmail.error = 'Invalid email address for customer';
         }
 
     } catch (error) {
-        console.error('❌ Email Sending Failed:', error);
+        console.error('❌ SendGrid Email Failed:', error);
+        if (error.response) {
+            console.error(error.response.body); // Log detailed SendGrid errors
+        }
         results.agencyEmail.error = error.message;
         results.customerEmail.error = error.message;
     }
@@ -229,20 +207,18 @@ async function sendTripEmails(formData) {
     return results;
 }
 
-// Helper function to send contact emails
+// Helper function to send contact emails via SendGrid
 async function sendContactEmail(formData) {
-    if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
-        console.error('❌ Email Error: Gmail credentials not configured');
-        return false;
+    if (!process.env.SENDGRID_API_KEY) {
+        console.error('❌ Email Error: SendGrid API Key not configured');
+        return { success: false, error: 'Missing API Key' };
     }
 
-    const transporter = createTransporter();
-
     try {
-        const mailOptions = {
-            from: `"Contact Form" <${process.env.EMAIL_USER}>`,
+        const msg = {
             to: process.env.ADMIN_EMAIL || 'greaterandbettertravelagency@gmail.com',
-            replyTo: formData.email,
+            from: 'greaterandbettertravelagency@gmail.com', // Must be verified
+            replyTo: formData.email, // Replies go to the user
             subject: `📩 New Contact Message from ${formData.firstName} ${formData.lastName}`,
             html: `
                 <h3>New Contact Message</h3>
@@ -253,8 +229,8 @@ async function sendContactEmail(formData) {
             `
         };
 
-        await transporter.sendMail(mailOptions);
-        console.log('✅ Contact Email Sent');
+        await sgMail.send(msg);
+        console.log('✅ Contact Email Sent via SendGrid');
         return { success: true };
     } catch (error) {
         console.error('❌ Contact Email Failed:', error);
