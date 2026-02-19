@@ -26,6 +26,23 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // 3.5. Mobile Menu Logic
+    const menuToggle = document.getElementById('menu-toggle');
+    const navLinks = document.getElementById('nav-links');
+
+    if (menuToggle && navLinks) {
+        menuToggle.addEventListener('click', () => {
+            navLinks.classList.toggle('active');
+        });
+
+        // Close menu when a link is clicked
+        navLinks.querySelectorAll('a').forEach(link => {
+            link.addEventListener('click', () => {
+                navLinks.classList.remove('active');
+            });
+        });
+    }
+
     // 4. Modal Logic
     const tripPage = document.getElementById("trip-page");
     const closeTripPage = document.getElementById("close-trip-page");
