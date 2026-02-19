@@ -18,7 +18,16 @@
     <style>
         html {
             scroll-behavior: smooth;
-            /* Smooth scrolling for anchor links */
+            overflow-x: hidden;
+            width: 100%;
+        }
+
+        img,
+        video,
+        canvas,
+        svg {
+            max-width: 100%;
+            height: auto;
         }
 
         * {
@@ -1412,6 +1421,32 @@
 
             .contact-form-container button:hover {
                 background: #b88b2e;
+            }
+
+            /* Fix for long emails overflowing */
+            .contact-info .info-item {
+                display: flex;
+                align-items: center;
+                gap: 15px;
+                margin-bottom: 20px;
+                font-size: 1.1rem;
+                word-break: break-all;
+                /* Force break for long emails */
+            }
+
+            /* Mobile adjustments for Contact Section */
+            @media (max-width: 768px) {
+                .contact-wrapper {
+                    flex-direction: column;
+                    gap: 30px;
+                    padding: 10px;
+                }
+
+                .contact-info,
+                .contact-form-container {
+                    min-width: 100%;
+                    /* Full width on mobile */
+                }
             }
 
             /* Immersive Dashboard Styles */
