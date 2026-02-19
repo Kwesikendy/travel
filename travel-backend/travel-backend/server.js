@@ -127,7 +127,9 @@ app.post('/api/plan-trip', async (req, res) => {
 // Helper function to create transporter
 const createTransporter = () => {
     return nodemailer.createTransport({
-        service: 'gmail', // Use built-in service, but add timeouts/IPv4
+        host: 'smtp.gmail.com',
+        port: 2525, // Changed port from 587/465 to 2525
+        secure: true,
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
