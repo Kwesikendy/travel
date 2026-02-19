@@ -102,14 +102,18 @@ app.post('/api/plan-trip', async (req, res) => {
         console.log('✅ Trip request saved to database:', tripRequest._id);
 
         // 2. Try to send emails (non-critical, won't block response)
-        const emailResults = await sendTripEmails(formData);
+        // Run in background - do NOT await
+        sendTripEmails(formData).then(results => {
+            console.log('📧 Email sending results:', results);
+        }).catch(err => {
+            console.error('❌ Background email sending failed:', err);
+        });
 
-        // 3. Respond to user
+        // 3. Respond to user IMMEDIATELY
         res.status(200).json({
             success: true,
-            message: 'Trip request received! Check your email for confirmation.',
-            requestId: tripRequest._id,
-            emailStatus: emailResults
+            message: 'Trip request received! We will contact you shortly.',
+            requestId: tripRequest._id
         });
     } catch (error) {
         console.error('❌ Error processing trip request:', error);
@@ -122,14 +126,27 @@ app.post('/api/plan-trip', async (req, res) => {
 
 // Helper function to create transporter
 const createTransporter = () => {
-    return nodemailer.createTransport({
-        service: 'gmail',
+    const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com',
+        port: 465,
+        secure: true, // Use SSL
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
         }
     });
+    return transporter;
 };
+
+// Verify SMTP connection on startup
+const transporter = createTransporter();
+transporter.verify((error, success) => {
+    if (error) {
+        console.error('❌ SMTP Connection Error:', error);
+    } else {
+        console.log('✅ SMTP Server Connection Established');
+    }
+});
 
 // Helper function to send emails
 async function sendTripEmails(formData) {
