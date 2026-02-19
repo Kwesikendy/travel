@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Trips - Greater & Better Travel</title>
+
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;700&display=swap"
+        rel="stylesheet">
+
+    <!-- CSS -->
+    <link rel="stylesheet" href="css/dashboard.css">
+    <link rel="icon" href="logo.PNG" type="image/png">
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+</head>
+
+<body>
+    <div class="dashboard-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="logo">
+                    <img src="logo.PNG" alt="G&B Logo" style="height: 40px; border-radius: 8px;">
+                    <span>G&B Travel</span>
+                </div>
+                <!-- Mobile Close Button -->
+                <button id="sidebar-close" class="btn-icon">
+                    <i data-lucide="x"></i>
+                </button>
+            </div>
+
+            <nav>
+                <ul class="nav-menu">
+                    <li class="nav-item">
+                        <a href="#" class="nav-link active">
+                            <i data-lucide="layout-dashboard"></i>
+                            <span>My Trips</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#" id="plan-btn" class="nav-link">
+                            <i data-lucide="plus-circle"></i>
+                            <span>Plan New Trip</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="/" class="nav-link">
+                    <i data-lucide="home"></i>
+                    <span>Back to Website</span>
+                </a>
+                <a href="#" class="nav-link" id="logout-btn">
+                    <i data-lucide="log-out"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button id="sidebar-toggle" class="btn-icon">
+                        <i data-lucide="menu"></i>
+                    </button>
+                    <div>
+                        <h1>My Trips</h1>
+                        <p class="header-subtitle">Track and manage your travel adventures</p>
+                    </div>
+                </div>
+
+                <div class="header-right">
+                    <div class="user-info">
+                        <span class="user-greeting">Welcome,</span>
+                        <span class="user-name" id="user-name">Traveler</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Stats Grid -->
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-icon combined">
+                        <i data-lucide="globe"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Total Requests</p>
+                        <h3 class="stat-value" id="total-trips">0</h3>
+                        <div class="stat-trend neutral">
+                            <i data-lucide="activity"></i>
+                            <span>Lifetime</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon pending">
+                        <i data-lucide="clock"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Pending</p>
+                        <h3 class="stat-value" id="pending-trips">0</h3>
+                        <div class="stat-trend pending">
+                            <i data-lucide="loader"></i>
+                            <span>Awaiting action</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-icon completed">
+                        <i data-lucide="check-circle"></i>
+                    </div>
+                    <div class="stat-info">
+                        <p class="stat-label">Completed</p>
+                        <h3 class="stat-value" id="completed-trips">0</h3>
+                        <div class="stat-trend success">
+                            <i data-lucide="check"></i>
+                            <span>Ready to go</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Trips Section -->
+            <section class="section-content">
+                <div class="section-header">
+                    <h2 class="section-title">Your Trip Requests</h2>
+                </div>
+
+                <div id="trips-container">
+                    <div class="loading-container">
+                        <div class="spinner"></div>
+                        <p>Loading your adventures...</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <!-- Trip Planning Modal -->
+    <section id="trip-page">
+        <div class="close-btn" id="close-trip-page">×</div>
+        <h3>Select Visa Type to Proceed</h3>
+        <div class="form-container">
+            <p style="margin-bottom: 20px;">Please fill out your details to start planning. Selecting a visa type will
+                guide our recommendations.</p>
+            <form id="trip-form">
+                <input type="text" name="visaType" placeholder="Desired Visa Type (e.g., Tourist, Business)" required
+                    style="grid-column: span 2;">
+                <input type="text" name="fullName" placeholder="Full Name" required>
+                <input type="email" name="email" placeholder="Email" required>
+                <input type="tel" name="phone" placeholder="Phone">
+                <input type="text" name="destination" placeholder="Destination" required>
+                <input type="text" name="departureCity" placeholder="Departure City" required>
+
+                <label>Take Off Day*
+                    <input type="date" name="takeOffDay" required>
+                </label>
+                <label>Return Date
+                    <input type="date" name="returnDate">
+                </label>
+
+                <label style="grid-column: span 1;">Number of People*
+                    <input type="number" name="people" min="1" value="1" required>
+                </label>
+
+                <textarea name="preferences" placeholder="Preferences (hotels, flights, tours...)" rows="3"></textarea>
+                <button type="submit">Submit</button>
+            </form>
+        </div>
+    </section>
+
+    <!-- Scripts -->
+    <script src="js/my-trips.js"></script>
+    <script>
+        // Sidebar Toggle Logic (Inline for simplicity, or could extract to shared js)
+        const sidebar = document.getElementById('sidebar');
+        const sidebarToggle = document.getElementById('sidebar-toggle');
+        const sidebarClose = document.getElementById('sidebar-close');
+
+        // Create overlay
+        const overlay = document.createElement('div');
+        overlay.className = 'sidebar-overlay';
+        document.body.appendChild(overlay);
+
+        function toggleSidebar() {
+            sidebar.classList.toggle('open');
+            overlay.style.opacity = sidebar.classList.contains('open') ? '1' : '0';
+            overlay.style.visibility = sidebar.classList.contains('open') ? 'visible' : 'hidden';
+        }
+
+        function closeSidebar() {
+            sidebar.classList.remove('open');
+            overlay.style.opacity = '0';
+            overlay.style.visibility = 'hidden';
+        }
+
+        if (sidebarToggle) sidebarToggle.addEventListener('click', (e) => { e.stopPropagation(); toggleSidebar(); });
+        if (sidebarClose) sidebarClose.addEventListener('click', closeSidebar);
+        if (overlay) overlay.addEventListener('click', closeSidebar);
+    </script>
+</body>
+
+</html>
