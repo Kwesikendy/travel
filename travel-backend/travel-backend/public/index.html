@@ -1259,48 +1259,40 @@
                 border-left: 4px solid #f44336;
             }
 
-            /* SERVICES SECTION */
+            /* SERVICES SECTION - Matching Destinations Style */
             .services-background {
-                background: rgba(255, 255, 255, 0.1);
-                backdrop-filter: blur(10px);
-                -webkit-backdrop-filter: blur(10px);
-                padding: 60px 20px;
+                background: linear-gradient(135deg, rgba(30, 30, 30, 0.8), rgba(60, 40, 20, 0.8));
+                /* Darker, like destinations */
+                padding: 40px;
+                border-radius: 20px;
+                border: 1px solid rgba(255, 255, 255, 0.2);
+                box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+                max-width: 1250px;
+                /* Increased to fit 4 cards (4*280 + gaps) */
+                margin: 40px auto;
+                /* Center the container */
             }
 
             .services-grid {
                 display: flex;
                 flex-wrap: wrap;
-                /* Allow wrapping like destinations */
                 gap: 20px;
-                /* Match standard gap */
-                max-width: 1000px;
-                /* Reduced from 1200px to match content width */
-                margin: 0 auto;
                 justify-content: center;
-                /* Center cards like destinations */
+                padding: 20px 0;
             }
 
             .service-card {
-                background: rgba(255, 255, 255, 0.95);
-                /* Light background like cards */
-                border-radius: 12px;
+                background: white;
+                /* Clean white card */
+                border-radius: 10px;
+                /* Matching destination card radius */
                 overflow: hidden;
-                /* For image */
-                text-align: left;
-                /* Align text left like destinations */
+                box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
                 transition: transform 0.3s ease, box-shadow 0.3s ease;
-                color: #333;
-                /* Dark text for readability on white */
-                padding: 0;
-                /* Remove padding to let image fill top */
-                border: none;
-                height: 100%;
+                width: 280px;
+                /* Increased card width */
                 display: flex;
                 flex-direction: column;
-                width: 250px;
-                /* Fixed width to match small cards */
-                flex: 0 0 auto;
-                /* Prevent stretching */
             }
 
             .service-card:hover {
@@ -1450,71 +1442,79 @@
         </section>
 
 
-        <section id="services" class="section services-background">
-            <h3
-                style="text-align: center; font-family: 'Playfair Display', serif; color: white; font-size: 2.5rem; margin-bottom: 50px; text-shadow: 0 2px 5px rgba(0,0,0,0.3);">
-                Our Premium Services</h3>
-            <div class="services-grid">
-                <!-- Visa Applications -->
-                <div class="service-card">
-                    <img src="https://images.unsplash.com/photo-1478860409698-8707f313ee8b?auto=format&fit=crop&w=800"
-                        alt="Visa Application">
-                    <div class="service-info">
-                        <h4>Visa Applications</h4>
-                        <p>Hassle-free visa processing for all major destinations. We navigate the complexities so you
-                            don't have to.</p>
+        <section id="services" class="section">
+            <!-- Wrap content in a container matching Top Destinations -->
+            <div class="services-background">
+                <h3
+                    style="text-align: center; font-family: 'Playfair Display', serif; color: white; font-size: 2rem; margin-bottom: 30px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">
+                    Our Premium Services</h3>
+                <div class="services-grid">
+                    <!-- Visa Applications -->
+                    <div class="service-card">
+                        <img src="https://images.unsplash.com/photo-1478860409698-8707f313ee8b?auto=format&fit=crop&w=800"
+                            alt="Visa Application">
+                        <div class="service-info">
+                            <h4>Visa Applications</h4>
+                            <p>Hassle-free visa processing for all major destinations. We navigate the complexities so
+                                you
+                                don't have to.</p>
+                        </div>
+                    </div>
+                    <!-- Hotel Reservations -->
+                    <div class="service-card">
+                        <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800"
+                            alt="Luxury Hotel">
+                        <div class="service-info">
+                            <h4>Hotel Reservations</h4>
+                            <p>From luxury resorts to boutique stays, we secure the best accommodations at exclusive
+                                rates
+                                worldwide.</p>
+                        </div>
+                    </div>
+                    <!-- Passport Application -->
+                    <div class="service-card">
+                        <img src="pass.jpg" alt="Passport Services">
+                        <div class="service-info">
+                            <h4>Passport Application</h4>
+                            <p>Expedited passport services to ensure your travel documents are ready when adventure
+                                calls.
+                            </p>
+                        </div>
+                    </div>
+                    <!-- Study Abroad -->
+                    <div class="service-card">
+                        <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800"
+                            alt="Study Abroad">
+                        <div class="service-info">
+                            <h4>Study Abroad</h4>
+                            <p>Unlock global opportunities with our comprehensive guidance for international education
+                                and
+                                student visas.</p>
+                        </div>
+                    </div>
+                    <!-- Work Abroad -->
+                    <div class="service-card">
+                        <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800"
+                            alt="Work Abroad">
+                        <div class="service-info">
+                            <h4>Work Abroad</h4>
+                            <p>Expand your career horizons with our expert assistance in securing work permits and
+                                finding
+                                global employment.</p>
+                        </div>
+                    </div>
+                    <!-- Holiday Planning -->
+                    <div class="service-card">
+                        <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800"
+                            alt="Holiday Planning">
+                        <div class="service-info">
+                            <h4>Holiday Planning</h4>
+                            <p>Tailor-made itineraries for your dream vacation. We craft every detail for an
+                                unforgettable
+                                experience.</p>
+                        </div>
                     </div>
                 </div>
-                <!-- Hotel Reservations -->
-                <div class="service-card">
-                    <img src="https://images.unsplash.com/photo-1566073771259-6a8506099945?auto=format&fit=crop&w=800"
-                        alt="Luxury Hotel">
-                    <div class="service-info">
-                        <h4>Hotel Reservations</h4>
-                        <p>From luxury resorts to boutique stays, we secure the best accommodations at exclusive rates
-                            worldwide.</p>
-                    </div>
-                </div>
-                <!-- Passport Application -->
-                <div class="service-card">
-                    <img src="pass.jpg" alt="Passport Services">
-                    <div class="service-info">
-                        <h4>Passport Application</h4>
-                        <p>Expedited passport services to ensure your travel documents are ready when adventure calls.
-                        </p>
-                    </div>
-                </div>
-                <!-- Study Abroad -->
-                <div class="service-card">
-                    <img src="https://images.unsplash.com/photo-1524178232363-1fb2b075b655?auto=format&fit=crop&w=800"
-                        alt="Study Abroad">
-                    <div class="service-info">
-                        <h4>Study Abroad</h4>
-                        <p>Unlock global opportunities with our comprehensive guidance for international education and
-                            student visas.</p>
-                    </div>
-                </div>
-                <!-- Work Abroad -->
-                <div class="service-card">
-                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800"
-                        alt="Work Abroad">
-                    <div class="service-info">
-                        <h4>Work Abroad</h4>
-                        <p>Expand your career horizons with our expert assistance in securing work permits and finding
-                            global employment.</p>
-                    </div>
-                </div>
-                <!-- Holiday Planning -->
-                <div class="service-card">
-                    <img src="https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800"
-                        alt="Holiday Planning">
-                    <div class="service-info">
-                        <h4>Holiday Planning</h4>
-                        <p>Tailor-made itineraries for your dream vacation. We craft every detail for an unforgettable
-                            experience.</p>
-                    </div>
-                </div>
-            </div>
         </section>
 
 
