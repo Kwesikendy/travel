@@ -1268,11 +1268,16 @@
             }
 
             .services-grid {
-                display: grid;
-                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-                gap: 30px;
-                max-width: 1200px;
+                display: flex;
+                flex-wrap: wrap;
+                /* Allow wrapping like destinations */
+                gap: 20px;
+                /* Match standard gap */
+                max-width: 1000px;
+                /* Reduced from 1200px to match content width */
                 margin: 0 auto;
+                justify-content: center;
+                /* Center cards like destinations */
             }
 
             .service-card {
@@ -1292,6 +1297,10 @@
                 height: 100%;
                 display: flex;
                 flex-direction: column;
+                width: 250px;
+                /* Fixed width to match small cards */
+                flex: 0 0 auto;
+                /* Prevent stretching */
             }
 
             .service-card:hover {
@@ -1301,7 +1310,8 @@
 
             .service-card img {
                 width: 100%;
-                height: 200px;
+                height: 150px;
+                /* Reduced from 200px */
                 object-fit: cover;
                 transition: transform 0.5s ease;
             }
@@ -1311,7 +1321,8 @@
             }
 
             .service-info {
-                padding: 20px;
+                padding: 15px;
+                /* Reduced padding */
                 flex-grow: 1;
                 display: flex;
                 flex-direction: column;
@@ -1319,8 +1330,9 @@
 
             .service-card h4 {
                 font-family: 'Playfair Display', serif;
-                font-size: 1.4rem;
-                margin-bottom: 10px;
+                font-size: 1.2rem;
+                /* Reduced font size */
+                margin-bottom: 8px;
                 color: #d1a340;
             }
 
@@ -1465,8 +1477,7 @@
                 </div>
                 <!-- Passport Application -->
                 <div class="service-card">
-                    <img src="https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800"
-                        alt="Passport Services">
+                    <img src="pass.jpg" alt="Passport Services">
                     <div class="service-info">
                         <h4>Passport Application</h4>
                         <p>Expedited passport services to ensure your travel documents are ready when adventure calls.
@@ -1481,6 +1492,16 @@
                         <h4>Study Abroad</h4>
                         <p>Unlock global opportunities with our comprehensive guidance for international education and
                             student visas.</p>
+                    </div>
+                </div>
+                <!-- Work Abroad -->
+                <div class="service-card">
+                    <img src="https://images.unsplash.com/photo-1522202176988-66273c2fd55f?auto=format&fit=crop&w=800"
+                        alt="Work Abroad">
+                    <div class="service-info">
+                        <h4>Work Abroad</h4>
+                        <p>Expand your career horizons with our expert assistance in securing work permits and finding
+                            global employment.</p>
                     </div>
                 </div>
                 <!-- Holiday Planning -->
