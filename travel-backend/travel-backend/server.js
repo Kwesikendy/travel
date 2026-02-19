@@ -128,8 +128,8 @@ app.post('/api/plan-trip', async (req, res) => {
 const createTransporter = () => {
     const transporter = nodemailer.createTransport({
         host: 'smtp.gmail.com',
-        port: 465,
-        secure: true, // Use SSL
+        port: 587, // Use 587 for StartTLS
+        secure: false, // upgrade later with STARTTLS
         auth: {
             user: process.env.EMAIL_USER,
             pass: process.env.EMAIL_PASS
